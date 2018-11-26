@@ -1,0 +1,20 @@
+TARGET_FILE = km
+BUILD_DIR = ./build
+SRC_DIRS = ./src
+INCL_DIRS = ./include
+
+# add .c file here
+SRCS_FILE = main.c status.c List.c city.c read_file_map.c
+
+SRCS = $(SRCS_FILE:%=$(SRC_DIRS)/%)
+OBJS = $(SRCS_FILE:%.c=$(BUILD_DIR)/%.o)
+CC = gcc
+
+INCL_FLAG = -I $(INCL_DIRS)
+DEBUG_FLAG = -g -D DEBUG
+
+$(BUILD_DIR)/%.o: $(SRC_DIRS)/%.c
+	$(CC) -c $< -o $@ $(INCL_FLAG) $(DEBUG_FLAG)
+
+$(TARGET_FILE): $(OBJS)
+	$(CC) $(OBJS) -o $@  $(DEBUG_FLAG)

@@ -1,0 +1,8 @@
+{
+    "cSpell.words": [
+        "strupr"
+    ],
+    "files.associations": {
+        "string.h": "c"
+    }
+}
