@@ -8,7 +8,7 @@
 // return 0 otherwise
 City *newCity()
 {
-    List *neighborList = newList(compareCity, printNeighborInfo);
+    List *neighborList = newList(compareNeighbor, printNeighborInfo);
     City *city = malloc(sizeof(City));
     if (!city || !neighborList)
         return 0;
@@ -18,8 +18,8 @@ City *newCity()
 
     city->name[0] = 0;
     city->neighbors = neighborList;
-    city->posX = 0;
-    city->posY = 0;
+    city->latitude = 0;
+    city->longitude = 0;
 
     return city;
 }
@@ -60,6 +60,15 @@ int compareCity(void *city1, void *city2)
     return strcmpi(((City *)city1)->name, ((City *)city2)->name);
 }
 
+// Compare neighbor to neighbor by their distance to the city
+//  @param n1 the pointer to the neighbor 1
+//  @param n2 the pointer to the neighbor 2
+//  return int
+int compareNeighbor(void *n1, void *n2)
+{
+    return ((Neighbor *)n1)->distance - ((Neighbor *)n2)->distance;
+}
+
 // free memory allocated to a city
 //  @param city the city need to be deleted
 void delCity(City *city)
@@ -76,13 +85,30 @@ void delCity(City *city)
     free(city);
 }
 
-// Check if the city is in the map
+// Check if the cityname is in the map
 //  @param map the list of city
-//  @param city the city that need to validate
-//  return -1 if found; 0 if not found
-int isValidCity(List *map, City *city)
+//  @param name the cityname that need to validate
+//  return pointer to the City if found; 0 if not found
+City *isValidCity(List *map, char *name)
 {
-    return isInList(map, city) != 0;
+    City *city = newCity();
+
+    if (!city)
+    {
+        printf(message(ERRALLOC));
+        return 0;
+    }
+
+    setCityname(city, name);
+    Node *node = isInList(map, city);
+    free(city);
+
+    if (node == (Node *)0)
+        return 0;
+    else if (node == (Node *)1)
+        return (City *)map->head->val;
+
+    return (City *)node->next->val;
 }
 
 // puts the city->name to stdout
@@ -93,7 +119,7 @@ void printCityInfo(void *city)
 
     // Display neighbor name for testing purpose only
     // printf("\n");
-    // printf("%s, position : %d/%d, neighbors : %d\n", ((City *)city)->name, ((City *)city)->posX, ((City *)city)->posY, ((City *)city)->neighbors->nelts);
+    // printf("%s, position : %d/%d, neighbors : %d\n", ((City *)city)->name, ((City *)city)->latitude, ((City *)city)->longitude, ((City *)city)->neighbors->nelts);
     // displayList(((City *)city)->neighbors);
 }
 
@@ -106,16 +132,16 @@ void printNeighborInfo(void *n)
 // set the cityname
 //  @param city the city that has the name
 //  @param name the name to be set
-//  @param posX the posX to be set
-//  @param posY the posY to be set
-void setCityInfo(City *city, char *name, int posX, int posY)
+//  @param latitude the latitude to be set
+//  @param longitude the longitude to be set
+void setCityInfo(City *city, char *name, int latitude, int longitude)
 {
     if (!city)
         return;
 
     setCityname(city, name);
-    city->posX = posX;
-    city->posY = posY;
+    city->latitude = latitude;
+    city->longitude = longitude;
 }
 
 // set the cityname

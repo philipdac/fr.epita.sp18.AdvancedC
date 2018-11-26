@@ -6,72 +6,99 @@
 #include "List.h"
 #include "map.h"
 
-void getCityname(City *fromCity, City *toCity)
+void getCityname(char *fromName, char *toName)
 {
     printf("Searching for the shortest route between 2 cities.\n");
 
-    printf("Enter name of city 1: ");
-    fgets(fromCity->name, MAX_CITY_NAME_LENGTH, stdin);
+    printf(" - Enter the name of city 1: ");
+    // Only get MAX_CITY_NAME_LENGTH from the keyboard
+    fgets(fromName, MAX_CITY_NAME_LENGTH, stdin);
     // fgets also get newline character into end of the string. Need to remove it
-    fromCity->name[strcspn(fromCity->name, "\n")] = 0;
+    fromName[strcspn(fromName, "\n")] = 0;
 
-    printf("Enter name of city 2: ");
-    fgets(toCity->name, MAX_CITY_NAME_LENGTH, stdin);
-    toCity->name[strcspn(toCity->name, "\n")] = 0;
+    printf(" - Enter the name of city 2: ");
+    fgets(toName, MAX_CITY_NAME_LENGTH, stdin);
+    toName[strcspn(toName, "\n")] = 0;
 }
 
-int isValidSearchCities(List *map, City *fromCity, City *toCity)
+int isValidSearchNames(List *map, City **fromCity, char *fromName, City **toCity, char *toName)
 {
-    int isValid = isValidCity(map, fromCity) || isValidCity(map, toCity);
+    *fromCity = isValidCity(map, fromName);
+    *toCity = isValidCity(map, toName);
 
-    if (isValid)
+    if (!*fromCity || !*toCity)
     {
-        return -1;
+        printf("\nSearching for the route failed\n");
+        printf("We can't find the entered name(s) in our database\n");
+        printf("Please get city name from the below list: \n");
+        displayList(map);
+
+        return 0;
     }
 
-    printf("\nSearching for the route failed\n");
-    printf("We can't find your name(s) in our database\n");
-    printf("Please get city name from the below list: \n");
-    displayList(map);
-
-    return 0;
+    return -1;
 }
 
 int main(int argc, char const *argv[])
 {
     status result;
+    char fromName[MAX_CITY_NAME_LENGTH];
+    char toName[MAX_CITY_NAME_LENGTH];
 
-    City *fromCity = newCity();
-    City *toCity = newCity();
-    if (!fromCity && !toCity)
-        return ERRALLOC;
+    City *fromCity = 0, *toCity = 0;
 
-    if (argc != 3)
+    // Initiate the map and routes
+    List *map = newList(compareCity, printCityInfo);
+    if (!map)
     {
-        getCityname(fromCity, toCity);
+        result = ERRALLOC;
+        printf(message(result));
+        return result;
+    }
+
+    List *route = newList(compareCity, printCityInfo);
+    if (!route)
+    {
+        free(map);
+
+        result = ERRALLOC;
+        printf(message(result));
+        return result;
+    }
+
+    // Read data to the map
+    char *mapFile = "FRANCE.MAP";
+    result = map_file_to_list(mapFile, map);
+    if (result != OK)
+    {
+        printf(message(result));
+        return result;
+    }
+
+    // Get city names
+    if (argc == 3)
+    {
+        snprintf((char *)fromName, MAX_CITY_NAME_LENGTH, (char *)argv[1]);
+        snprintf((char *)toName, MAX_CITY_NAME_LENGTH, (char *)argv[2]);
     }
     else
     {
-        setCityname(fromCity, (char *)argv[1]);
-        setCityname(toCity, (char *)argv[2]);
+        getCityname((char *)fromName, (char *)toName);
     }
 
-    List *map = newList(compareCity, printCityInfo);
-    if (!map)
-        return ERRALLOC;
-
-    char *mapFile = "FRANCE.MAP";
-    if (result = map_file_to_list(mapFile, map))
-        return result;
-
-    if (!isValidSearchCities(map, fromCity, toCity))
+    // Validate the city names
+    if (!isValidSearchNames(map, &fromCity, (char *)fromName, &toCity, (char *)toName))
         return 0;
 
-    // test
+    search_route(map, fromCity, toCity, route);
 
+    // test
+    // displayList(map);
     // end test
 
+    // Clean the memory
     delList(map);
+    delList(route);
 
     return 0;
 }

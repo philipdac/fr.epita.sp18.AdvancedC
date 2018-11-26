@@ -1,3 +1,6 @@
+#ifndef __city_H
+#define __city_H
+
 #include "common.h"
 #include "List.h"
 
@@ -10,8 +13,8 @@ typedef struct Neighbor
 typedef struct City
 {
     char name[MAX_CITY_NAME_LENGTH];
-    int posX;
-    int posY;
+    int latitude;
+    int longitude;
     struct List *neighbors;
 } City;
 
@@ -35,17 +38,23 @@ Neighbor *newNeighbor(City *, char *, int);
 //  return int as the result of strcmpi
 int compareCity(void *, void *);
 
+// Compare neighbor to neighbor by their distance to the city
+//  @param n1 the pointer to the neighbor 1
+//  @param n2 the pointer to the neighbor 2
+//  return int
+int compareNeighbor(void *, void *);
+
 // free memory allocated to a city
 void delCity(City *);
 
 // free memory allocated to a neighbor
 void delNeighbor(Neighbor *);
 
-// Check if the city is in the map
+// Check if the cityname is in the map
 //  @param map the list of city
-//  @param city the city that need to validate
-//  return int as the result of isInList
-int isValidCity(List *, City *);
+//  @param name the cityname that need to validate
+//  return pointer to the City if found; 0 if not found
+City *isValidCity(List *, char *);
 
 // puts the city information into stdout
 void printCityInfo(void *);
@@ -56,11 +65,13 @@ void printNeighborInfo(void *);
 // set the city information
 //  @param city the city that has the name
 //  @param name the name to be set
-//  @param posX the posX to be set
-//  @param posY the posY to be set
+//  @param latitude the latitude to be
+//  @param longitude the longitude to be set
 void setCityInfo(City *, char *, int, int);
 
 // set the cityname
 //  @param city the city that has the name
 //  @param name the name to be set
 void setCityname(City *, char *);
+
+#endif
