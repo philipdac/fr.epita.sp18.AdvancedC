@@ -41,6 +41,12 @@ void delCity(City *);
 // free memory allocated to a neighbor
 void delNeighbor(Neighbor *);
 
+// Check if the city is in the map
+//  @param map the list of city
+//  @param city the city that need to validate
+//  return int as the result of isInList
+int isValidCity(List *, City *);
+
 // puts the city information into stdout
 void printCityInfo(void *);
 

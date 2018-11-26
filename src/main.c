@@ -20,6 +20,23 @@ void getCityname(City *fromCity, City *toCity)
     toCity->name[strcspn(toCity->name, "\n")] = 0;
 }
 
+int isValidSearchCities(List *map, City *fromCity, City *toCity)
+{
+    int isValid = isValidCity(map, fromCity) || isValidCity(map, toCity);
+
+    if (isValid)
+    {
+        return -1;
+    }
+
+    printf("\nSearching for the route failed\n");
+    printf("We can't find your name(s) in our database\n");
+    printf("Please get city name from the below list: \n");
+    displayList(map);
+
+    return 0;
+}
+
 int main(int argc, char const *argv[])
 {
     status result;
@@ -47,10 +64,11 @@ int main(int argc, char const *argv[])
     if (result = map_file_to_list(mapFile, map))
         return result;
 
-    // test
-    printf("Compare = %d\n", compareCity(fromCity, toCity));
+    if (!isValidSearchCities(map, fromCity, toCity))
+        return 0;
 
-    displayList(map);
+    // test
+
     // end test
 
     delList(map);

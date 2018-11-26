@@ -76,13 +76,25 @@ void delCity(City *city)
     free(city);
 }
 
+// Check if the city is in the map
+//  @param map the list of city
+//  @param city the city that need to validate
+//  return -1 if found; 0 if not found
+int isValidCity(List *map, City *city)
+{
+    return isInList(map, city) != 0;
+}
+
 // puts the city->name to stdout
 //  @param city the city that has the name to be printed
 void printCityInfo(void *city)
 {
-    printf("\n");
-    printf("%s, position : %d/%d, neighbors : %d\n", ((City *)city)->name, ((City *)city)->posX, ((City *)city)->posY, ((City *)city)->neighbors->nelts);
-    displayList(((City *)city)->neighbors);
+    printf("%s", ((City *)city)->name);
+
+    // Display neighbor name for testing purpose only
+    // printf("\n");
+    // printf("%s, position : %d/%d, neighbors : %d\n", ((City *)city)->name, ((City *)city)->posX, ((City *)city)->posY, ((City *)city)->neighbors->nelts);
+    // displayList(((City *)city)->neighbors);
 }
 
 // puts the neighbor information into stdout

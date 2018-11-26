@@ -22,7 +22,6 @@ status map_file_to_list(char *file, List *map)
 
     while (fscanf(fp, "%s %d %d", name, &num1, &num2) != EOF)
     {
-        printf("name %s, num1 %d, num2 %d\n", name, num1, num2);
         // An empty row
         if (!strlen(name))
             continue;
