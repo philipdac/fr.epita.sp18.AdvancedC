@@ -22,8 +22,12 @@ void getCityname(City *fromCity, City *toCity)
 
 int main(int argc, char const *argv[])
 {
+    status result;
+
     City *fromCity = newCity();
     City *toCity = newCity();
+    if (!fromCity && !toCity)
+        return ERRALLOC;
 
     if (argc != 3)
     {
@@ -35,18 +39,21 @@ int main(int argc, char const *argv[])
         setCityname(toCity, (char *)argv[2]);
     }
 
-    List *mapList = newList(compareCity, printCityname);
+    List *map = newList(compareCity, printCityInfo);
+    if (!map)
+        return ERRALLOC;
+
     char *mapFile = "FRANCE.MAP";
-    map_file_to_list(mapFile, mapList);
+    if (result = map_file_to_list(mapFile, map))
+        return result;
 
     // test
     printf("Compare = %d\n", compareCity(fromCity, toCity));
 
-    addList(mapList, fromCity);
-    addList(mapList, toCity);
-
-    displayList(mapList);
+    displayList(map);
     // end test
+
+    delList(map);
 
     return 0;
 }

@@ -20,6 +20,15 @@ typedef struct City
 //  return 0 otherwise
 City *newCity();
 
+// Allocate memory for a neighbor struct and set the its information
+//  @param city the city that connects with the neighbor
+//  @param neighbor theneighbor that has the name
+//  @param name the name to be set
+//  @param distance the distance between city and the neighbor
+//  return an pointer of empty neighbor if memory allocation OK
+//  return 0 otherwise
+Neighbor *newNeighbor(City *, char *, int);
+
 // Compare city to city by name
 //  @param city1 the pointer to the city1
 //  @param city2 the pointer to the city2
@@ -27,10 +36,23 @@ City *newCity();
 int compareCity(void *, void *);
 
 // free memory allocated to a city
-void delCity(City *city);
+void delCity(City *);
 
-// puts the city->name to stdout
-void printCityname(void *);
+// free memory allocated to a neighbor
+void delNeighbor(Neighbor *);
+
+// puts the city information into stdout
+void printCityInfo(void *);
+
+// puts the neighbor information into stdout
+void printNeighborInfo(void *);
+
+// set the city information
+//  @param city the city that has the name
+//  @param name the name to be set
+//  @param posX the posX to be set
+//  @param posY the posY to be set
+void setCityInfo(City *, char *, int, int);
 
 // set the cityname
 //  @param city the city that has the name
