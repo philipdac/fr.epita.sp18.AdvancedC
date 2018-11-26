@@ -47,7 +47,7 @@ void delCity(City *city)
 //  @param city the city that has the name to be printed
 void printCityname(void *city)
 {
-    puts(((City *)city)->name);
+    printf(((City *)city)->name);
 }
 
 // set the cityname
