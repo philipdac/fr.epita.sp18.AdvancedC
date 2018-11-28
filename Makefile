@@ -4,7 +4,7 @@ SRC_DIRS = ./src
 INCL_DIRS = ./include
 
 # add .c file here
-SRCS_FILE = main.c status.c List.c city.c map_file_to_list.c search_route.c
+SRCS_FILE = city.c List.c main.c map_read_data_file.c map_search.c route.c status.c 
 
 SRCS = $(SRCS_FILE:%=$(SRC_DIRS)/%)
 OBJS = $(SRCS_FILE:%.c=$(BUILD_DIR)/%.o)

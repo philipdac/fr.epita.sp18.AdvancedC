@@ -4,6 +4,7 @@
 #include "city.h"
 #include "common.h"
 #include "List.h"
+#include "route.h"
 #include "map.h"
 
 void getCityname(char *fromName, char *toName)
@@ -56,7 +57,7 @@ int main(int argc, char const *argv[])
         return result;
     }
 
-    List *route = newList(compareCity, printCityInfo);
+    List *route = newList(compareCity, printRouteNode);
     if (!route)
     {
         free(map);
@@ -68,7 +69,7 @@ int main(int argc, char const *argv[])
 
     // Read data to the map
     char *mapFile = "FRANCE.MAP";
-    result = map_file_to_list(mapFile, map);
+    result = map_read_data_file(mapFile, map);
     if (result != OK)
     {
         printf(message(result));
@@ -90,15 +91,30 @@ int main(int argc, char const *argv[])
     if (!isValidSearchNames(map, &fromCity, (char *)fromName, &toCity, (char *)toName))
         return 0;
 
-    search_route(map, fromCity, toCity, route);
+    printf("Reques is seaching for route from %s to %s\n", fromCity->name, toCity->name);
 
-    // test
-    // displayList(map);
-    // end test
+    // Perform the search
+    result = map_search(map, fromCity, toCity, route);
+    if (result != OK)
+    {
+        printf(message(result));
+        return result;
+    }
+
+    // Display the search result
+    if (!lengthList(route))
+    {
+        printf("Sorry there is no route from %s to %s in our database", fromCity->name, toCity->name);
+    }
+    else
+    {
+        printf("Result:\n");
+        displayList(route);
+    }
 
     // Clean the memory
-    delList(map);
     delList(route);
+    delList(map);
 
     return 0;
 }

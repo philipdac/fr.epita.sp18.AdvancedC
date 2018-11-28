@@ -7,7 +7,7 @@
 #include "List.h"
 #include "status.h"
 
-status map_file_to_list(char *file, List *map)
+status map_read_data_file(char *file, List *map)
 {
     FILE *fp;
     char name[MAX_CITY_NAME_LENGTH];

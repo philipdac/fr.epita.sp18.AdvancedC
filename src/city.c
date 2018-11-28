@@ -3,15 +3,30 @@
 
 #include "city.h"
 #include "List.h"
+#include "route.h"
 
 // return an empty city pointer if memory allocation OK
 // return 0 otherwise
 City *newCity()
 {
-    List *neighborList = newList(compareNeighbor, printNeighborInfo);
-    City *city = malloc(sizeof(City));
-    if (!city || !neighborList)
+    RouteNode *node = newRouteNode();
+    if (!node)
         return 0;
+
+    List *neighborList = newList(compareNeighbor, printNeighborInfo);
+    if (!neighborList)
+    {
+        delRouteNode(node);
+        return 0;
+    }
+
+    City *city = malloc(sizeof(City));
+    if (!city)
+    {
+        delRouteNode(node);
+        delList(neighborList);
+        return 0;
+    }
 
     neighborList->head = 0;
     neighborList->nelts = 0;
@@ -20,6 +35,7 @@ City *newCity()
     city->neighbors = neighborList;
     city->latitude = 0;
     city->longitude = 0;
+    city->routeNode = node;
 
     return city;
 }
@@ -80,6 +96,12 @@ void delCity(City *city)
     {
         // free memory allocated to the neighbor list
         delList(city->neighbors);
+    }
+
+    if (city->routeNode)
+    {
+        // free memory allocated to the route node
+        delRouteNode(city->routeNode);
     }
 
     free(city);
