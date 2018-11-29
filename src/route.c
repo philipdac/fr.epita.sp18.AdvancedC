@@ -39,9 +39,17 @@ Route *newRoute(City *city, City *prevCity, int distance, int costFromStart, Cit
 //  @param r1 the pointer to the route 1
 //  @param r2 the pointer to the route 2
 //  @return int as the differences between the two costToGoal
-int compareRoute(void *r1, void *r2)
+int preferSmallCostToGoal(void *r1, void *r2)
 {
     return ((Route *)r1)->costToGoal - ((Route *)r1)->costToGoal;
+}
+
+// The later route is always < previous route, so that it pop out sooner
+//  @param r1 the pointer to the route 1
+//  @param r2 the pointer to the route 2
+int LIFO(void *r1, void *r2)
+{
+    return -1;
 }
 
 // Free memory allocated to a route
@@ -54,9 +62,10 @@ void delRoute(Route *route)
 // Check if the route existed in the provided list
 //  @param list the list of routes
 //  @param check the route that need to be checked
+//  @param revertedCheck the route is checking in the reverted way, from city back to prevCity
 //  @return pointer of the route found in list
 //  @return 0 if not found
-Route *isRouteInList(List *list, Route *check)
+Route *isRouteInList(List *list, Route *check, int revertedCheck)
 {
     status stat;
     Route *route;
@@ -68,8 +77,16 @@ Route *isRouteInList(List *list, Route *check)
         if (stat != OK)
             return 0;
 
-        if (strcmpi(route->city->name, check->city->name) == 0)
-            return route;
+        if (revertedCheck)
+        {
+            if (strcmpi(route->city->name, check->prevCity->name) == 0 && strcmpi(route->prevCity->name, check->city->name) == 0)
+                return route;
+        }
+        else
+        {
+            if (strcmpi(route->city->name, check->city->name) == 0 && strcmpi(route->prevCity->name, check->prevCity->name) == 0)
+                return route;
+        }
     }
 
     return 0;
@@ -78,5 +95,6 @@ Route *isRouteInList(List *list, Route *check)
 // Puts the route information into stdout
 void printRoute(void *route)
 {
-    printf("(%s -> %s : %dkm)", ((Route *)route)->prevCity->name, ((Route *)route)->city->name, ((Route *)route)->distFromPrev);
+    if (((Route *)route)->prevCity && ((Route *)route)->city)
+        printf("(%s -> %s : %d km)", ((Route *)route)->prevCity->name, ((Route *)route)->city->name, ((Route *)route)->distFromPrev);
 }

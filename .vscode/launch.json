@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/km.exe",
             "args": [
                 "Paris",
-                "Calais"
+                "Brest"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

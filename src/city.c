@@ -123,12 +123,12 @@ City *getCityByName(List *map, char *name)
 //  @param city the city that has the name to be printed
 void printCityInfo(void *city)
 {
-    // printf("%s", ((City *)city)->name);
+    printf("%s", ((City *)city)->name);
 
     // Display neighbor name for testing purpose only
-    printf("\n");
-    printf("%s, position : %d/%d, neighbors : %d\n", ((City *)city)->name, ((City *)city)->latitude, ((City *)city)->longitude, ((City *)city)->neighbors->nelts);
-    displayList(((City *)city)->neighbors);
+    // printf("\n");
+    // printf("%s, position : %d/%d, neighbors : %d\n", ((City *)city)->name, ((City *)city)->latitude, ((City *)city)->longitude, ((City *)city)->neighbors->nelts);
+    // displayList(((City *)city)->neighbors);
 }
 
 // puts the neighbor information into stdout

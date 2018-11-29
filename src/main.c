@@ -9,7 +9,7 @@
 
 void getCityname(char *startCityName, char *goalCityName)
 {
-    printf("Searching for the shortest route between 2 cities.\n");
+    printf("Searching for the shortest routeList between 2 cities.\n");
 
     printf(" - Enter the name of city 1: ");
     // Only get MAX_CITY_NAME_LENGTH from the keyboard
@@ -29,7 +29,7 @@ int isValidSearchNames(List *map, City **startCity, char *startCityName, City **
 
     if (!*startCity || !*goalCity)
     {
-        printf("\nSearching for the route failed\n");
+        printf("\nSearching for the routeList failed\n");
         printf("We can't find the entered name(s) in our database\n");
         printf("Please get city name from the below list: \n");
         displayList(map);
@@ -57,8 +57,8 @@ int main(int argc, char const *argv[])
         return result;
     }
 
-    List *route = newList(compareCityByName, printRoute);
-    if (!route)
+    List *routeList = newList(LIFO, printRoute);
+    if (!routeList)
     {
         free(map);
 
@@ -94,7 +94,7 @@ int main(int argc, char const *argv[])
     printf("Seaching for route from %s to %s\n", startCity->name, goalCity->name);
 
     // Perform the search
-    result = map_search(map, startCity, goalCity, route);
+    result = map_search(map, startCity, goalCity, routeList);
     if (result != OK)
     {
         printf(message(result));
@@ -102,18 +102,18 @@ int main(int argc, char const *argv[])
     }
 
     // Display the search result
-    if (!lengthList(route))
+    if (!lengthList(routeList))
     {
         printf("Sorry there is no route from %s to %s in our database", startCity->name, goalCity->name);
     }
     else
     {
         printf("Result:\n");
-        displayList(route);
+        displayList(routeList);
     }
 
     // Clean the memory
-    delList(route);
+    delList(routeList);
     delList(map);
 
     return 0;
