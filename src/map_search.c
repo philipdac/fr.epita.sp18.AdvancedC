@@ -7,6 +7,22 @@
 #include "route.h"
 #include "status.h"
 
+status updateFoundRoute(List *closedList, List *routeList)
+{
+    status stat;
+    int i, len = closedList->nelts;
+    Route *route;
+    for (i = 1; i <= len; i++)
+    {
+        stat = nthInList(closedList, i, (void *)&route);
+        if (stat != OK)
+            return stat;
+        stat = addList(routeList, route);
+        if (stat != OK)
+            return stat;
+    }
+}
+
 // Search the shortest route between startCity and goalCity
 //  @param map the map where we perform our search
 //  @param startCity the starting city
@@ -28,26 +44,19 @@ status map_search(List *map, City *startCity, City *goalCity, List *route)
     if (!start)
         return ERRALLOC;
 
-    start->city = startCity;
-    start->prevCity = 0;
-    start->distFromPrev = 0;
-    start->costFromStart = 0;
-    start->costToGoal = INT_MAX;
-
     stat = addList(openList, start);
     if (stat != OK)
         return stat;
 
-    return 0;
-
-    while (openList->nelts > 0)
+    int found = 0;
+    while (openList->nelts > 0 && !found)
     {
         Route *current;
         // The top node in openList has lowest costToGoal
         stat = nthInList(openList, 1, (void *)&current);
 
         int i;
-        for (i = 0; i < current->city->neighbors->nelts; i++)
+        for (i = 1; i <= current->city->neighbors->nelts; i++)
         {
             Neighbor *nei;
             stat = nthInList(current->city->neighbors, i, (void *)&nei);
@@ -59,62 +68,33 @@ status map_search(List *map, City *startCity, City *goalCity, List *route)
             if (nei->city != goalCity)
             {
                 // nextCity existed in openList?
+                Route *existed = isRouteInList(openList, nextRoute);
+                if (!existed)
+                {
+                    addList(openList, nextRoute);
+                }
+                else if (existed->costToGoal > nextRoute->costToGoal)
+                {
+                    // This route is faster and need to be consider
+                    // otherwise, just ignore it
+                    addList(openList, nextRoute);
+                }
             }
             else
             {
                 // Reach the destination
+                addList(closedList, nextRoute);
+                found = -1;
+                break;
             }
         }
 
         addList(closedList, current);
     }
 
+    stat = updateFoundRoute(closedList, route);
+    if (stat != OK)
+        return stat;
+
     return OK;
 }
-// status map_search1(List *map, City *startCity, City *goalCity, List *route)
-// {
-//     if (!map || !route)
-//         return ERREMPTY;
-
-//     City *visit, *nextCity;
-//     int mapSize = lengthList(map);
-//     int idx, distFromStart = 0;
-
-//     Neighbor *neighbor;
-//     int idxNeighbor, neighborQty;
-
-//     status stat;
-
-//     startCity->routeNode->distFromStart = 0;
-//     goalCity->routeNode->distToGoal = 0;
-
-//     for (idx = 0; idx < mapSize; idx++)
-//     {
-//         stat = nthInList(map, idx, &visit);
-//         if (stat != OK)
-//             return ERRINDEX;
-
-//         if (visit->routeNode->distFromStart != INT_MAX) // this city is already visited
-//             continue;
-
-//         for (idxNeighbor = 0; idxNeighbor < neighborQty; idxNeighbor++)
-//         {
-//             stat = nthInList(visit->neighbors, idxNeighbor, &neighbor);
-//             if (stat != OK)
-//                 return ERRINDEX;
-
-//             nextCity = getCityByName();
-//             if (!(nextCity))
-//                 return ERREMPTY;
-
-//             if (nextCity->routeNode->distFromStart != INT_MAX) // this city is already visited
-//                 continue;
-
-//             nextCity->routeNode->distFromStart = distFromStart + nextCity->routeNode->distFromPrev;
-//         }
-
-//         // visit->routeNode->distFromStart = distFromStart +
-//     }
-
-//     return OK;
-// }

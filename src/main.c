@@ -87,8 +87,6 @@ int main(int argc, char const *argv[])
         getCityname((char *)startCityName, (char *)goalCityName);
     }
 
-    displayList(map);
-
     // Validate the city names
     if (!isValidSearchNames(map, &startCity, (char *)startCityName, &goalCity, (char *)goalCityName))
         return 0;

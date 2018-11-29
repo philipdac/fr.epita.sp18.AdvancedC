@@ -1,5 +1,6 @@
 #include <limits.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "route.h"
 
@@ -43,14 +44,38 @@ int compareRoute(void *r1, void *r2)
     return ((Route *)r1)->costToGoal - ((Route *)r1)->costToGoal;
 }
 
-// free memory allocated to a route
+// Free memory allocated to a route
 void delRoute(Route *route)
 {
     if (!route)
         free(route);
 }
 
-// puts the route information into stdout
+// Check if the route existed in the provided list
+//  @param list the list of routes
+//  @param check the route that need to be checked
+//  @return pointer of the route found in list
+//  @return 0 if not found
+Route *isRouteInList(List *list, Route *check)
+{
+    status stat;
+    Route *route;
+    int i, len = list->nelts;
+
+    for (i = 1; i <= len; i++)
+    {
+        stat = nthInList(list, i, (void *)&route);
+        if (stat != OK)
+            return 0;
+
+        if (strcmpi(route->city->name, check->city->name) == 0)
+            return route;
+    }
+
+    return 0;
+}
+
+// Puts the route information into stdout
 void printRoute(void *route)
 {
     printf("(%s -> %s : %dkm)", ((Route *)route)->prevCity->name, ((Route *)route)->city->name, ((Route *)route)->distFromPrev);

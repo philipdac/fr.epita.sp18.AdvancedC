@@ -30,10 +30,17 @@ Route *newRoute(City *, City *, int, int, City *);
 //  return int as the result of costToGoal1 - costToGoal2
 int compareRoute(void *, void *);
 
-// free memory allocated to a route
+// Free memory allocated to a route
 void delRoute(Route *);
 
-// puts the route information into stdout
+// Check if the route existed in the provided list
+//  @param list the list of routes
+//  @param check the route that need to be checked
+//  @return pointer of the route found in list
+//  @return 0 if not found
+Route *isRouteInList(List *, Route *);
+
+// Puts the route information into stdout
 void printRoute(void *);
 
 #endif
