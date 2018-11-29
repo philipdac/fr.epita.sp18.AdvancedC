@@ -12,7 +12,7 @@ status map_read_data_file(char *file, List *map)
     FILE *fp;
     char name[MAX_CITY_NAME_LENGTH];
     int num1 = INT_MAX, num2 = INT_MAX;
-    City *city = NULL;
+    City *city, *cityAsNeighbor;
 
     fp = fopen(file, "r");
     if (!fp)
@@ -20,6 +20,7 @@ status map_read_data_file(char *file, List *map)
 
     status result = OK;
 
+    // First read: city data
     while (fscanf(fp, "%s %d %d", name, &num1, &num2) != EOF)
     {
         // An empty row
@@ -45,21 +46,46 @@ status map_read_data_file(char *file, List *map)
             setCityInfo(city, name, num1, num2);
             addList(map, city);
         }
+
+        num1 = INT_MAX;
+        num2 = INT_MAX;
+    }
+
+    // Rewind the file pointer to BOF
+    rewind(fp);
+
+    Neighbor *neighbor;
+
+    // Second read: neighbor data
+    while (fscanf(fp, "%s %d %d", name, &num1, &num2) != EOF)
+    {
+        // An empty row
+        if (!strlen(name))
+            continue;
+        // num1 has no value --> invalid data: this situation already trap in the first loop
+
+        if (num2 != INT_MAX)
+        {
+            city = getCityByName(map, name);
+        }
         else
         {
-            // Found a neighbor line without city line in advanced --> invalid data
-            if (!city)
+            cityAsNeighbor = getCityByName(map, name);
+            if (!cityAsNeighbor)
             {
-                result = ERRUNABLE;
+                result = ERRABSENT;
                 break;
             }
 
             // Neighbor info
-            if (!newNeighbor(city, name, num1))
+            neighbor = newNeighbor(cityAsNeighbor, num1);
+            if (!neighbor)
             {
                 result = ERRALLOC;
                 break;
             }
+
+            addList(city->neighbors, neighbor);
         }
 
         num1 = INT_MAX;

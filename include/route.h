@@ -5,28 +5,33 @@
 #include "List.h"
 #include "status.h"
 
-typedef struct RouteNode
+int goalLatitude;
+int goalLongitude;
+
+typedef struct Route
 {
+    struct City *city;
     struct City *prevCity;
     int distFromPrev;
+    int costFromStart;
+    int costToGoal;
+} Route;
 
-    // distFromStart is 0 for the route node of the starting city
-    // distFromStart is INT_MAX for unvisited city
-    int distFromStart;
-
-    // distToGoal is 0 for the route node of the destination city
-    int distToGoal;
-} RouteNode;
-
-// Allocate memory for a route node struct
-//  return an pointer of empty route node if memory allocation OK
+// Allocate memory for a route struct
+//  return an pointer of empty route if memory allocation OK
 //  return 0 otherwise
-RouteNode *newRouteNode();
+Route *newRoute();
 
-// free memory allocated to a route node
-void delRouteNode(RouteNode *);
+// Compare route to to route by costToGoal
+//  @param r1 the pointer to the route 1
+//  @param r2 the pointer to the route 2
+//  return int as the result of costToGoal1 - costToGoal2
+int compareRoute(void *, void *);
 
-// puts the route node information into stdout
-void printRouteNode(void *);
+// free memory allocated to a route
+void delRoute(Route *);
+
+// puts the route information into stdout
+void printRoute(void *);
 
 #endif

@@ -3,32 +3,50 @@
 
 #include "route.h"
 
-// Allocate memory for a route node struct
-//  return an pointer of empty route node if memory allocation OK
-//  return 0 otherwise
-RouteNode *newRouteNode()
+int getCostToGoal(City *city, City *goalCity)
 {
-    RouteNode *node = malloc(sizeof(RouteNode));
-    if (!node)
+    int gap1 = city->latitude - goalCity->latitude;
+    int gap2 = city->longitude - goalCity->longitude;
+
+    return gap1 * gap1 + gap2 * gap2;
+}
+
+// Allocate memory for a route struct
+//  return an pointer of empty route if memory allocation OK
+//  return 0 otherwise
+Route *newRoute(City *city, City *prevCity, int distance, int costFromStart, City *goalCity)
+{
+    Route *route = malloc(sizeof(Route));
+    if (!route)
         return 0;
 
-    node->prevCity = 0;
-    node->distFromPrev = INT_MAX;
-    node->distFromStart = INT_MAX;
-    node->distToGoal = INT_MAX;
+    route->city = city;
+    route->prevCity = prevCity;
+    route->distFromPrev = distance;
+    route->costFromStart = costFromStart;
+    route->costToGoal = getCostToGoal(city, goalCity);
 
-    return node;
+    return route;
 }
 
-// free memory allocated to a route node
-void delRouteNode(RouteNode *node)
+// Compare route to route by costToGoal to have the better one
+//  @param r1 the pointer to the route 1
+//  @param r2 the pointer to the route 2
+//  return int as the differences between the two costToGoal
+int compareRoute(void *r1, void *r2)
 {
-    if (!node)
-        free(node);
+    return ((Route *)r1)->costToGoal - ((Route *)r1)->costToGoal;
 }
 
-// puts the route node information into stdout
-void printRouteNode(void *city)
+// free memory allocated to a route
+void delRoute(Route *route)
 {
-    printf("(%s -> %s : %dkm)", ((City *)city)->routeNode->prevCity->name, ((City *)city)->name, ((City *)city)->routeNode->distFromPrev);
+    if (!route)
+        free(route);
+}
+
+// puts the route information into stdout
+void printRoute(void *route)
+{
+    printf("(%s -> %s : %dkm)", ((Route *)route)->prevCity->name, ((Route *)route)->city->name, ((Route *)route)->distFromPrev);
 }

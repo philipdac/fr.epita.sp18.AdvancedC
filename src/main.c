@@ -24,8 +24,8 @@ void getCityname(char *fromName, char *toName)
 
 int isValidSearchNames(List *map, City **fromCity, char *fromName, City **toCity, char *toName)
 {
-    *fromCity = isValidCity(map, fromName);
-    *toCity = isValidCity(map, toName);
+    *fromCity = getCityByName(map, fromName);
+    *toCity = getCityByName(map, toName);
 
     if (!*fromCity || !*toCity)
     {
@@ -49,7 +49,7 @@ int main(int argc, char const *argv[])
     City *fromCity = 0, *toCity = 0;
 
     // Initiate the map and routes
-    List *map = newList(compareCity, printCityInfo);
+    List *map = newList(compareCityByName, printCityInfo);
     if (!map)
     {
         result = ERRALLOC;
@@ -57,7 +57,7 @@ int main(int argc, char const *argv[])
         return result;
     }
 
-    List *route = newList(compareCity, printRouteNode);
+    List *route = newList(compareCityByName, printRoute);
     if (!route)
     {
         free(map);
@@ -87,11 +87,13 @@ int main(int argc, char const *argv[])
         getCityname((char *)fromName, (char *)toName);
     }
 
+    displayList(map);
+
     // Validate the city names
     if (!isValidSearchNames(map, &fromCity, (char *)fromName, &toCity, (char *)toName))
         return 0;
 
-    printf("Reques is seaching for route from %s to %s\n", fromCity->name, toCity->name);
+    printf("Seaching for route from %s to %s\n", fromCity->name, toCity->name);
 
     // Perform the search
     result = map_search(map, fromCity, toCity, route);

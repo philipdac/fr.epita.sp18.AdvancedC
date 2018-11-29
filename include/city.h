@@ -7,7 +7,7 @@
 
 typedef struct Neighbor
 {
-    char name[MAX_CITY_NAME_LENGTH];
+    struct City *city;
     int distance;
 } Neighbor;
 
@@ -17,7 +17,7 @@ typedef struct City
     int latitude;
     int longitude;
     struct List *neighbors;
-    struct RouteNode *routeNode;
+    struct RouteNode *routeNode; // this field is to be deleted
 } City;
 
 // Allocate memory for a city struct
@@ -26,19 +26,18 @@ typedef struct City
 City *newCity();
 
 // Allocate memory for a neighbor struct and set the its information
-//  @param city the city that connects with the neighbor
-//  @param neighbor theneighbor that has the name
-//  @param name the name to be set
-//  @param distance the distance between city and the neighbor
+// Allocate memory for a neighbor struct and set the its information
+//  @param city the city that is playing a role of neighbor
+//  @param distance the distance between this city and the previous one
 //  return an pointer of empty neighbor if memory allocation OK
 //  return 0 otherwise
-Neighbor *newNeighbor(City *, char *, int);
+Neighbor *newNeighbor(City *, int);
 
 // Compare city to city by name
 //  @param city1 the pointer to the city1
 //  @param city2 the pointer to the city2
 //  return int as the result of strcmpi
-int compareCity(void *, void *);
+int compareCityByName(void *, void *);
 
 // Compare neighbor to neighbor by their distance to the city
 //  @param n1 the pointer to the neighbor 1
@@ -52,11 +51,11 @@ void delCity(City *);
 // free memory allocated to a neighbor
 void delNeighbor(Neighbor *);
 
-// Check if the cityname is in the map
+// Get the cityname in the list by its name
 //  @param map the list of city
-//  @param name the cityname that need to validate
+//  @param name the cityname
 //  return pointer to the City if found; 0 if not found
-City *isValidCity(List *, char *);
+City *getCityByName(List *, char *);
 
 // puts the city information into stdout
 void printCityInfo(void *);

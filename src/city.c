@@ -9,21 +9,15 @@
 // return 0 otherwise
 City *newCity()
 {
-    RouteNode *node = newRouteNode();
-    if (!node)
-        return 0;
-
     List *neighborList = newList(compareNeighbor, printNeighborInfo);
     if (!neighborList)
     {
-        delRouteNode(node);
         return 0;
     }
 
     City *city = malloc(sizeof(City));
     if (!city)
     {
-        delRouteNode(node);
         delList(neighborList);
         return 0;
     }
@@ -35,34 +29,23 @@ City *newCity()
     city->neighbors = neighborList;
     city->latitude = 0;
     city->longitude = 0;
-    city->routeNode = node;
 
     return city;
 }
 
 // Allocate memory for a neighbor struct and set the its information
-//  @param city the city that connects with the neighbor
-//  @param neighbor theneighbor that has the name
-//  @param name the name to be set
-//  @param distance the distance between city and the neighbor
-//  return an pointer of empty neighbor if memory allocation OK
+//  @param city the city that is playing a role of neighbor
+//  @param distance the distance between this city and the previous one
+//  return an pointer of neighbor if memory allocation OK
 //  return 0 otherwise
-Neighbor *newNeighbor(City *city, char *name, int distance)
+Neighbor *newNeighbor(City *city, int distance)
 {
     Neighbor *neighbor = malloc(sizeof(Neighbor));
     if (!neighbor)
         return 0;
 
-    snprintf(neighbor->name, MAX_CITY_NAME_LENGTH, name);
+    neighbor->city = city;
     neighbor->distance = distance;
-
-    status s = addList(city->neighbors, neighbor);
-    if (s != OK)
-    {
-        // addList has error, free the allocated memory and return 0;
-        free(neighbor);
-        return 0;
-    }
 
     return neighbor;
 }
@@ -71,7 +54,7 @@ Neighbor *newNeighbor(City *city, char *name, int distance)
 //  @param city1 the pointer to the city1
 //  @param city2 the pointer to the city2
 //  return int as the result of strcmpi
-int compareCity(void *city1, void *city2)
+int compareCityByName(void *city1, void *city2)
 {
     return strcmpi(((City *)city1)->name, ((City *)city2)->name);
 }
@@ -98,20 +81,23 @@ void delCity(City *city)
         delList(city->neighbors);
     }
 
-    if (city->routeNode)
-    {
-        // free memory allocated to the route node
-        delRouteNode(city->routeNode);
-    }
-
     free(city);
 }
 
-// Check if the cityname is in the map
+// free memory allocated to a neighbor
+void delNeighbor(Neighbor *neighbor)
+{
+    if (!neighbor)
+        return;
+
+    free(neighbor);
+}
+
+// Get the cityname in the list by its name
 //  @param map the list of city
-//  @param name the cityname that need to validate
+//  @param name the cityname
 //  return pointer to the City if found; 0 if not found
-City *isValidCity(List *map, char *name)
+City *getCityByName(List *map, char *name)
 {
     City *city = newCity();
 
@@ -137,18 +123,18 @@ City *isValidCity(List *map, char *name)
 //  @param city the city that has the name to be printed
 void printCityInfo(void *city)
 {
-    printf("%s", ((City *)city)->name);
+    // printf("%s", ((City *)city)->name);
 
     // Display neighbor name for testing purpose only
-    // printf("\n");
-    // printf("%s, position : %d/%d, neighbors : %d\n", ((City *)city)->name, ((City *)city)->latitude, ((City *)city)->longitude, ((City *)city)->neighbors->nelts);
-    // displayList(((City *)city)->neighbors);
+    printf("\n");
+    printf("%s, position : %d/%d, neighbors : %d\n", ((City *)city)->name, ((City *)city)->latitude, ((City *)city)->longitude, ((City *)city)->neighbors->nelts);
+    displayList(((City *)city)->neighbors);
 }
 
 // puts the neighbor information into stdout
 void printNeighborInfo(void *n)
 {
-    printf("(%s, %d)", ((Neighbor *)n)->name, ((Neighbor *)n)->distance);
+    printf("(%s, %d)", ((Neighbor *)n)->city->name, ((Neighbor *)n)->distance);
 }
 
 // set the cityname
