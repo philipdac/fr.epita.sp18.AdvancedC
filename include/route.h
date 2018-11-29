@@ -5,9 +5,6 @@
 #include "List.h"
 #include "status.h"
 
-int goalLatitude;
-int goalLongitude;
-
 typedef struct Route
 {
     struct City *city;
@@ -18,9 +15,14 @@ typedef struct Route
 } Route;
 
 // Allocate memory for a route struct
-//  return an pointer of empty route if memory allocation OK
-//  return 0 otherwise
-Route *newRoute();
+//  @param city the city at ending side of the route
+//  @param prevCity the city at starting side of the route
+//  @param distance the distance between the 2 cities
+//  @param costFromStart the cost from startCity to the prevCity
+//  @param goalCity the destination city for calculation the costToGoal
+//  @return an pointer of empty route if memory allocation OK
+//  @return 0 otherwise
+Route *newRoute(City *, City *, int, int, City *);
 
 // Compare route to to route by costToGoal
 //  @param r1 the pointer to the route 1

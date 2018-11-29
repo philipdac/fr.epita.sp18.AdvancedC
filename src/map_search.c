@@ -7,14 +7,14 @@
 #include "route.h"
 #include "status.h"
 
-// Search the shortest route between fromCity and toCity
+// Search the shortest route between startCity and goalCity
 //  @param map the map where we perform our search
-//  @param fromCity the starting city
-//  @param toCity the destination city
+//  @param startCity the starting city
+//  @param goalCity the destination city
 //  @param route the result route
 //  @ return ERRINDEX if any error occurs during the search
 //  @ return OK otherwise
-status map_search(List *map, City *fromCity, City *toCity, List *route)
+status map_search(List *map, City *startCity, City *goalCity, List *route)
 {
     if (!map || !route)
         return ERREMPTY;
@@ -24,14 +24,11 @@ status map_search(List *map, City *fromCity, City *toCity, List *route)
     List *openList = newList(compareRoute, printRoute);
     List *closedList = newList(compareRoute, printRoute);
 
-    goalLatitude = toCity->latitude;
-    goalLongitude = toCity->longitude;
-
-    Route *start = newRoute();
+    Route *start = newRoute(startCity, 0, 0, 0, goalCity);
     if (!start)
         return ERRALLOC;
 
-    start->city = fromCity;
+    start->city = startCity;
     start->prevCity = 0;
     start->distFromPrev = 0;
     start->costFromStart = 0;
@@ -57,10 +54,11 @@ status map_search(List *map, City *fromCity, City *toCity, List *route)
             if (stat != OK)
                 return stat;
 
-            City *nextCity = nei->city;
+            Route *nextRoute = newRoute(nei->city, current->city, nei->distance, current->costFromStart, goalCity);
 
-            if (nextCity != toCity)
+            if (nei->city != goalCity)
             {
+                // nextCity existed in openList?
             }
             else
             {
@@ -73,7 +71,7 @@ status map_search(List *map, City *fromCity, City *toCity, List *route)
 
     return OK;
 }
-// status map_search1(List *map, City *fromCity, City *toCity, List *route)
+// status map_search1(List *map, City *startCity, City *goalCity, List *route)
 // {
 //     if (!map || !route)
 //         return ERREMPTY;
@@ -87,8 +85,8 @@ status map_search(List *map, City *fromCity, City *toCity, List *route)
 
 //     status stat;
 
-//     fromCity->routeNode->distFromStart = 0;
-//     toCity->routeNode->distToGoal = 0;
+//     startCity->routeNode->distFromStart = 0;
+//     goalCity->routeNode->distToGoal = 0;
 
 //     for (idx = 0; idx < mapSize; idx++)
 //     {

@@ -3,7 +3,6 @@
 
 #include "common.h"
 #include "List.h"
-#include "Route.h"
 
 typedef struct Neighbor
 {
@@ -17,7 +16,6 @@ typedef struct City
     int latitude;
     int longitude;
     struct List *neighbors;
-    struct RouteNode *routeNode; // this field is to be deleted
 } City;
 
 // Allocate memory for a city struct

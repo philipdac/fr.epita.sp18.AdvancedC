@@ -12,8 +12,13 @@ int getCostToGoal(City *city, City *goalCity)
 }
 
 // Allocate memory for a route struct
-//  return an pointer of empty route if memory allocation OK
-//  return 0 otherwise
+//  @param city the city at the ending side
+//  @param prevCity the city at the starting side
+//  @param distance the distance between the 2 cities
+//  @param costFromStart the cost from startCity to the prevCity
+//  @param goalCity the destination city for calculation the costToGoal
+//  @return an pointer of empty route if memory allocation OK
+//  @return 0 otherwise
 Route *newRoute(City *city, City *prevCity, int distance, int costFromStart, City *goalCity)
 {
     Route *route = malloc(sizeof(Route));
@@ -32,7 +37,7 @@ Route *newRoute(City *city, City *prevCity, int distance, int costFromStart, Cit
 // Compare route to route by costToGoal to have the better one
 //  @param r1 the pointer to the route 1
 //  @param r2 the pointer to the route 2
-//  return int as the differences between the two costToGoal
+//  @return int as the differences between the two costToGoal
 int compareRoute(void *r1, void *r2)
 {
     return ((Route *)r1)->costToGoal - ((Route *)r1)->costToGoal;
