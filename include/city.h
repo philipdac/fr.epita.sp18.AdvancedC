@@ -13,8 +13,11 @@ typedef struct Neighbor
 typedef struct City
 {
     char name[MAX_CITY_NAME_LENGTH];
+
+    // Equivalent to position X,Y in the .map file
     int latitude;
     int longitude;
+
     struct List *neighbors;
 } City;
 

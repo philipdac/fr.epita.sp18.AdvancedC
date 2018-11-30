@@ -8,8 +8,12 @@ int getCostToGoal(City *city, City *goalCity)
 {
     int gap1 = city->latitude - goalCity->latitude;
     int gap2 = city->longitude - goalCity->longitude;
+    int cost = gap1 * gap1 + gap2 * gap2;
 
-    return gap1 * gap1 + gap2 * gap2;
+    // Properly we should return sqrt(cost)
+    // But the comparion result doest not change if we return the none sqrt() one
+    // --> Speed up the search time
+    return cost;
 }
 
 // Allocate memory for a route struct
