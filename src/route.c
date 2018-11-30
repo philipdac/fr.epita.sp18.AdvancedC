@@ -15,55 +15,55 @@ int getCostToGoal(City *city, City *goalCity)
 }
 
 // Allocate memory for a route struct
-//  @param city the city at the ending side
-//  @param prevCity the city at the starting side
-//  @param distance the distance between the 2 cities
-//  @param costFromStart the cost from startCity to the prevCity
+//  @param city the city that the route reaches
+//  @param prevRoute the previous route
+//  @param distance the distance from previous city to this city
+//  @param cost the cost from start city to this city
 //  @return an pointer of empty route if memory allocation OK
 //  @return 0 otherwise
-Route *newFoundRoute(City *city, City *prevCity, int distFromPrev, int costFromStart)
+Route *newFoundRoute(City *city, Route *prevRoute, int distance, int cost)
 {
     Route *route = malloc(sizeof(Route));
     if (!route)
         return 0;
 
     route->city = city;
-    route->prevCity = prevCity;
-    route->distFromPrev = distFromPrev;
-    route->costFromStart = costFromStart;
+    route->prevRoute = prevRoute;
+    route->distFromPrev = distance;
+    route->costFromStart = cost;
     route->costToGoal = INT_MAX;
 
     return route;
 }
 
 // Allocate memory for a route struct
-//  @param city the city at the ending side
-//  @param prevCity the city at the starting side
-//  @param distance the distance between the 2 cities
-//  @param costFromStart the cost from startCity to the prevCity
+//  @param city the city that the route reaches
+//  @param prevRoute the previous route
+//  @param distance the distance from previous city to this city
+//  @param cost the cost from start city to this city
 //  @param goalCity the destination city for calculation the costToGoal
 //  @return an pointer of empty route if memory allocation OK
 //  @return 0 otherwise
-Route *newRoute(City *city, City *prevCity, int distance, int costFromStart, City *goalCity)
+Route *newRoute(City *city, Route *prevRoute, int distance, int cost, City *goalCity)
 {
     Route *route = malloc(sizeof(Route));
     if (!route)
         return 0;
 
     route->city = city;
-    route->prevCity = prevCity;
+    route->prevRoute = prevRoute;
     route->distFromPrev = distance;
-    route->costFromStart = costFromStart;
+    route->costFromStart = cost;
     route->costToGoal = getCostToGoal(city, goalCity);
 
     return route;
 }
 
-// Compare route to route by costToGoal to have the better one
+// Compare route to route by total cost to have the better one
 //  @param r1 the pointer to the route 1
 //  @param r2 the pointer to the route 2
 //  @return int as the differences between the two costToGoal
-int preferSmallCostToGoal(void *r1, void *r2)
+int preferLowerTotalCost(void *r1, void *r2)
 {
     return ((Route *)r1)->costFromStart + ((Route *)r1)->costToGoal - ((Route *)r2)->costFromStart - ((Route *)r2)->costToGoal;
 }
@@ -91,24 +91,28 @@ void delRoute(void *route)
 //  @return 0 if not found
 Route *isRouteInList(List *list, Route *check, int revertedCheck)
 {
-    status stat;
+    status exitCode;
     Route *route;
     int i, len = list->nelts;
 
     for (i = 1; i <= len; i++)
     {
-        stat = nthInList(list, i, (void *)&route);
-        if (stat != OK)
+        exitCode = nthInList(list, i, (void *)&route);
+        if (exitCode != OK)
             return 0;
 
         if (revertedCheck)
         {
-            if (strcmpi(route->city->name, check->prevCity->name) == 0 && strcmpi(route->prevCity->name, check->city->name) == 0)
+            int cityMatched = check->prevRoute && (strcmpi(route->city->name, check->prevRoute->city->name) == 0);
+            int prevCityMatched = route->prevRoute && (strcmpi(route->prevRoute->city->name, check->city->name) == 0);
+            if (cityMatched && prevCityMatched)
                 return route;
         }
         else
         {
-            if (strcmpi(route->city->name, check->city->name) == 0 && strcmpi(route->prevCity->name, check->prevCity->name) == 0)
+            int cityMatched = strcmpi(route->city->name, check->prevRoute->city->name) == 0;
+            int prevCityMatched = (route->prevRoute == 0 && check->prevRoute == 0) || ((route->prevRoute && check->prevRoute && strcmpi(route->prevRoute->city->name, check->prevRoute->city->name) == 0));
+            if (cityMatched && prevCityMatched)
                 return route;
         }
     }
@@ -119,6 +123,6 @@ Route *isRouteInList(List *list, Route *check, int revertedCheck)
 // Puts the route information into stdout
 void printRoute(void *route)
 {
-    if (((Route *)route)->prevCity && ((Route *)route)->city)
-        printf("(%s -> %s : %d km; from start = %d km)", ((Route *)route)->prevCity->name, ((Route *)route)->city->name, ((Route *)route)->distFromPrev, ((Route *)route)->costFromStart);
+    if (((Route *)route)->prevRoute && ((Route *)route)->city)
+        printf("(%s -> %s : %d km; from start = %d km)", ((Route *)route)->prevRoute->city->name, ((Route *)route)->city->name, ((Route *)route)->distFromPrev, ((Route *)route)->costFromStart);
 }

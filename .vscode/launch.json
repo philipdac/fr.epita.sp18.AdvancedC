@@ -10,8 +10,8 @@
             "request": "launch",
             "program": "${workspaceFolder}/km.exe",
             "args": [
-                "Paris",
-                "Brest"
+                "Rennes",
+                "Lyon"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

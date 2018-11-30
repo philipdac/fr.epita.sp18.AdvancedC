@@ -18,7 +18,7 @@ status mapReadDataFile(char *file, List *map)
     if (!fp)
         return ERROPEN;
 
-    status result = OK;
+    status exitCode = OK;
 
     // First read: city data
     while (fscanf(fp, "%s %d %d", name, &num1, &num2) != EOF)
@@ -29,7 +29,7 @@ status mapReadDataFile(char *file, List *map)
         // num1 has no value --> invalid data
         if (num1 == INT_MAX)
         {
-            result = ERRUNABLE;
+            exitCode = ERRUNABLE;
             break;
         }
 
@@ -39,7 +39,7 @@ status mapReadDataFile(char *file, List *map)
             city = newCity();
             if (!city)
             {
-                result = ERRALLOC;
+                exitCode = ERRALLOC;
                 break;
             }
 
@@ -73,7 +73,7 @@ status mapReadDataFile(char *file, List *map)
             cityAsNeighbor = getCityByName(map, name);
             if (!cityAsNeighbor)
             {
-                result = ERRABSENT;
+                exitCode = ERRABSENT;
                 break;
             }
 
@@ -81,7 +81,7 @@ status mapReadDataFile(char *file, List *map)
             neighbor = newNeighbor(cityAsNeighbor, num1);
             if (!neighbor)
             {
-                result = ERRALLOC;
+                exitCode = ERRALLOC;
                 break;
             }
 
@@ -94,5 +94,5 @@ status mapReadDataFile(char *file, List *map)
 
     fclose(fp);
 
-    return result;
+    return exitCode;
 }

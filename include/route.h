@@ -8,36 +8,36 @@
 typedef struct Route
 {
     struct City *city;
-    struct City *prevCity;
+    struct Route *prevRoute;
     int distFromPrev;
     int costFromStart;
     int costToGoal;
 } Route;
 
 // Allocate memory for a route struct
-//  @param city the city at the ending side
-//  @param prevCity the city at the starting side
-//  @param distance the distance between the 2 cities
-//  @param costFromStart the cost from startCity to the prevCity
+//  @param city the city that the route reaches
+//  @param prevRoute the previous route
+//  @param distance the distance from previous city to this city
+//  @param cost the cost from start city to this city
 //  @return an pointer of empty route if memory allocation OK
 //  @return 0 otherwise
-Route *newFoundRoute(City *, City *, int, int);
+Route *newFoundRoute(City *, Route *, int, int);
 
 // Allocate memory for a route struct
-//  @param city the city at ending side of the route
-//  @param prevCity the city at starting side of the route
-//  @param distance the distance between the 2 cities
-//  @param costFromStart the cost from startCity to the prevCity
+//  @param city the city that the route reaches
+//  @param prevRoute the previous route
+//  @param distance the distance from previous city to this city
+//  @param cost the cost from start city to this city
 //  @param goalCity the destination city for calculation the costToGoal
 //  @return an pointer of empty route if memory allocation OK
 //  @return 0 otherwise
-Route *newRoute(City *, City *, int, int, City *);
+Route *newRoute(City *, Route *, int, int, City *);
 
-// Compare route to to route by costToGoal
+// Compare route to route by total cost to have the better one
 //  @param r1 the pointer to the route 1
 //  @param r2 the pointer to the route 2
 //  return int as the result of costToGoal1 - costToGoal2
-int preferSmallCostToGoal(void *, void *);
+int preferLowerTotalCost(void *, void *);
 
 // The later route is always < previous route, so that it pop out earlier
 //  @param r1 the pointer to the route 1

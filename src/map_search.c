@@ -7,30 +7,19 @@
 #include "route.h"
 #include "status.h"
 
-status linkFoundRoutes(List *closedList, List *routeList, Route *finalRoute)
+status linkFoundRoutes(List *routeList, Route *finalRoute)
 {
-    status stat;
-    int i, len = closedList->nelts;
-    City *city = finalRoute->city;
-    Route *route;
+    status exitCode;
+    Route *route = finalRoute;
 
-    for (i = 1; i <= len; i++)
+    while (route->prevRoute)
     {
-        stat = nthInList(closedList, i, (void *)&route);
-        if (stat != OK)
-            return stat;
+        Route *found = newFoundRoute(route->city, route->prevRoute, route->distFromPrev, route->costFromStart);
+        exitCode = addList(routeList, found);
+        if (exitCode != OK)
+            return exitCode;
 
-        // Many routes in the closedList
-        // Take only the required chain
-        if (city == route->city && route->prevCity)
-        {
-            Route *found = newFoundRoute(route->city, route->prevCity, route->distFromPrev, route->costFromStart);
-            stat = addList(routeList, found);
-            if (stat != OK)
-                return stat;
-
-            city = route->prevCity;
-        }
+        route = route->prevRoute;
     }
 
     return OK;
@@ -97,14 +86,14 @@ status mapSearch(List *map, City *startCity, City *goalCity, List *routeList)
     if (!map || !routeList)
         return ERREMPTY;
 
-    status stat;
+    status exitCode;
 
-    List *openList = newList(preferSmallCostToGoal, printRoute);
+    List *openList = newList(preferLowerTotalCost, printRoute);
     List *closedList = newList(LIFO, printRoute);
     if (!openList || !closedList)
         return ERRALLOC;
 
-    Route *current, *nextRoute;
+    Route *currentRoute, *nextRoute;
     Route *start = newRoute(startCity, 0, 0, 0, goalCity);
     if (!start)
     {
@@ -112,45 +101,45 @@ status mapSearch(List *map, City *startCity, City *goalCity, List *routeList)
         return ERRALLOC;
     }
 
-    stat = addList(openList, start);
-    if (stat != OK)
+    exitCode = addList(openList, start);
+    if (exitCode != OK)
     {
         freeMemMapSearch(openList, closedList);
-        return stat;
+        return exitCode;
     }
 
     int found = 0;
     while (openList->nelts > 0 && !found)
     {
         // The top node in openList has lowest costToGoal
-        stat = nthInList(openList, 1, (void *)&current);
+        exitCode = nthInList(openList, 1, (void *)&currentRoute);
 
-        stat = addList(closedList, current);
-        if (stat != OK)
+        exitCode = addList(closedList, currentRoute);
+        if (exitCode != OK)
         {
             freeMemMapSearch(openList, closedList);
-            return stat;
+            return exitCode;
         }
 
-        stat = remFromList(openList, current);
-        if (stat != OK)
+        exitCode = remFromList(openList, currentRoute);
+        if (exitCode != OK)
         {
             freeMemMapSearch(openList, closedList);
-            return stat;
+            return exitCode;
         }
 
         int i;
-        for (i = 1; i <= current->city->neighbors->nelts; i++)
+        for (i = 1; i <= currentRoute->city->neighbors->nelts; i++)
         {
             Neighbor *nei;
-            stat = nthInList(current->city->neighbors, i, (void *)&nei);
-            if (stat != OK)
+            exitCode = nthInList(currentRoute->city->neighbors, i, (void *)&nei);
+            if (exitCode != OK)
             {
                 freeMemMapSearch(openList, closedList);
-                return stat;
+                return exitCode;
             }
 
-            nextRoute = newRoute(nei->city, current->city, nei->distance, nei->distance + current->costFromStart, goalCity);
+            nextRoute = newRoute(nei->city, currentRoute, nei->distance, nei->distance + currentRoute->costFromStart, goalCity);
 
             if (nei->city != goalCity)
             {
@@ -167,13 +156,8 @@ status mapSearch(List *map, City *startCity, City *goalCity, List *routeList)
         }
     }
 
-    stat = linkFoundRoutes(closedList, routeList, nextRoute);
-    if (stat != OK)
-    {
-        freeMemMapSearch(openList, closedList);
-        return stat;
-    }
-
+    exitCode = linkFoundRoutes(routeList, nextRoute);
     freeMemMapSearch(openList, closedList);
-    return OK;
+
+    return exitCode;
 }
