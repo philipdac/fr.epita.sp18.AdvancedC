@@ -9,7 +9,7 @@
 //  @param file the full path name of data file
 //  @param list the list to store map data
 //  return status the result of reading and mapping the data file
-status map_read_data_file(char *, List *);
+status mapReadDataFile(char *, List *);
 
 // Search the shortest route between fromCity and toCity
 //  @param map the map where we perform our search
@@ -18,6 +18,6 @@ status map_read_data_file(char *, List *);
 //  @param route the result route
 //  @ return ERRINDEX if any error occurs during the search
 //  @ return OK otherwise
-status map_search(List *, City *, City *, List *);
+status mapSearch(List *, City *, City *, List *);
 
 #endif

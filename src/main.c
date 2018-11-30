@@ -89,7 +89,7 @@ int main(int argc, char const *argv[])
 
     // Read data to the map
     char *mapFile = "FRANCE.MAP";
-    result = map_read_data_file(mapFile, map);
+    result = mapReadDataFile(mapFile, map);
     if (result != OK)
     {
         printf(message(result));
@@ -103,7 +103,7 @@ int main(int argc, char const *argv[])
     printf("Seaching for route from %s to %s\n", startCity->name, goalCity->name);
 
     // Perform the search
-    result = map_search(map, startCity, goalCity, routeList);
+    result = mapSearch(map, startCity, goalCity, routeList);
     if (result != OK)
     {
         printf(message(result));

@@ -92,7 +92,7 @@ void freeMemMapSearch(List *openList, List *closedList)
 //  @param route the result route
 //  @ return ERRINDEX if any error occurs during the search
 //  @ return OK otherwise
-status map_search(List *map, City *startCity, City *goalCity, List *routeList)
+status mapSearch(List *map, City *startCity, City *goalCity, List *routeList)
 {
     if (!map || !routeList)
         return ERREMPTY;
