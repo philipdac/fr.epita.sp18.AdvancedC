@@ -9,7 +9,7 @@
 // return 0 otherwise
 City *newCity()
 {
-    List *neighborList = newList(compareNeighbor, printNeighborInfo);
+    List *neighborList = newList(compareNeighborByDistance, printNeighborInfo);
     if (!neighborList)
     {
         return 0;
@@ -63,7 +63,7 @@ int compareCityByName(void *city1, void *city2)
 //  @param n1 the pointer to the neighbor 1
 //  @param n2 the pointer to the neighbor 2
 //  return int
-int compareNeighbor(void *n1, void *n2)
+int compareNeighborByDistance(void *n1, void *n2)
 {
     return ((Neighbor *)n1)->distance - ((Neighbor *)n2)->distance;
 }

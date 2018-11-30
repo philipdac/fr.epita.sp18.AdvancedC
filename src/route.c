@@ -1,4 +1,5 @@
 #include <limits.h>
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -10,10 +11,7 @@ int getCostToGoal(City *city, City *goalCity)
     int gap2 = city->longitude - goalCity->longitude;
     int cost = gap1 * gap1 + gap2 * gap2;
 
-    // Properly we should return sqrt(cost)
-    // But the comparion result doest not change if we return the none sqrt() one
-    // --> Speed up the search time
-    return cost;
+    return sqrt(cost);
 }
 
 // Allocate memory for a route struct
@@ -67,10 +65,10 @@ Route *newRoute(City *city, City *prevCity, int distance, int costFromStart, Cit
 //  @return int as the differences between the two costToGoal
 int preferSmallCostToGoal(void *r1, void *r2)
 {
-    return ((Route *)r1)->costToGoal - ((Route *)r2)->costToGoal;
+    return ((Route *)r1)->costFromStart + ((Route *)r1)->costToGoal - ((Route *)r2)->costFromStart - ((Route *)r2)->costToGoal;
 }
 
-// The later route is always < previous route, so that it pop out sooner
+// The later route is always < previous route, so that it pop out earlier
 //  @param r1 the pointer to the route 1
 //  @param r2 the pointer to the route 2
 int LIFO(void *r1, void *r2)

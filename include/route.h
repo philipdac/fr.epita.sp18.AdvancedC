@@ -39,7 +39,7 @@ Route *newRoute(City *, City *, int, int, City *);
 //  return int as the result of costToGoal1 - costToGoal2
 int preferSmallCostToGoal(void *, void *);
 
-// The later route is always < previous route, so that it pop out sooner
+// The later route is always < previous route, so that it pop out earlier
 //  @param r1 the pointer to the route 1
 //  @param r2 the pointer to the route 2
 int LIFO(void *, void *);

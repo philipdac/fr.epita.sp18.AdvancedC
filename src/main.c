@@ -66,6 +66,9 @@ int main(int argc, char const *argv[])
         getCityname((char *)startCityName, (char *)goalCityName);
     }
 
+    // Reject when startCityName == goalCityName
+    // if (isSameName(startCityName, goalCityName))
+
     City *startCity = 0, *goalCity = 0;
 
     // Initiate the map and routes

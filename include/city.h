@@ -44,7 +44,7 @@ int compareCityByName(void *, void *);
 //  @param n1 the pointer to the neighbor 1
 //  @param n2 the pointer to the neighbor 2
 //  return int
-int compareNeighbor(void *, void *);
+int compareNeighborByDistance(void *, void *);
 
 // Free memory allocated to a city
 void delCity(void *);
