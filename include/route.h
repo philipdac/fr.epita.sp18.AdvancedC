@@ -15,6 +15,15 @@ typedef struct Route
 } Route;
 
 // Allocate memory for a route struct
+//  @param city the city at the ending side
+//  @param prevCity the city at the starting side
+//  @param distance the distance between the 2 cities
+//  @param costFromStart the cost from startCity to the prevCity
+//  @return an pointer of empty route if memory allocation OK
+//  @return 0 otherwise
+Route *newFoundRoute(City *, City *, int, int);
+
+// Allocate memory for a route struct
 //  @param city the city at ending side of the route
 //  @param prevCity the city at starting side of the route
 //  @param distance the distance between the 2 cities
@@ -36,7 +45,7 @@ int preferSmallCostToGoal(void *, void *);
 int LIFO(void *, void *);
 
 // Free memory allocated to a route
-void delRoute(Route *);
+void delRoute(void *);
 
 // Check if the route existed in the provided list
 //  @param list the list of routes

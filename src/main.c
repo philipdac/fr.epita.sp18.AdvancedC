@@ -24,12 +24,21 @@ void getCityname(char *startCityName, char *goalCityName)
 
 int isValidSearchNames(List *map, City **startCity, char *startCityName, City **goalCity, char *goalCityName)
 {
+    if (strcmpi(startCityName, goalCityName) == 0)
+    {
+        // startCityName == goalCityName
+        printf("You have input the same name for 2 cities.\n");
+        printf("Please use any 2 different names from the below list:\n");
+        displayList(map);
+        return 0;
+    }
+
     *startCity = getCityByName(map, startCityName);
     *goalCity = getCityByName(map, goalCityName);
 
     if (!*startCity || !*goalCity)
     {
-        printf("\nSearching for the routeList failed\n");
+        printf("Searching for the routeList failed\n");
         printf("We can't find the entered name(s) in our database\n");
         printf("Please get city name from the below list: \n");
         displayList(map);
@@ -45,6 +54,17 @@ int main(int argc, char const *argv[])
     status result;
     char startCityName[MAX_CITY_NAME_LENGTH];
     char goalCityName[MAX_CITY_NAME_LENGTH];
+
+    // Get city names
+    if (argc == 3)
+    {
+        snprintf((char *)startCityName, MAX_CITY_NAME_LENGTH, (char *)argv[1]);
+        snprintf((char *)goalCityName, MAX_CITY_NAME_LENGTH, (char *)argv[2]);
+    }
+    else
+    {
+        getCityname((char *)startCityName, (char *)goalCityName);
+    }
 
     City *startCity = 0, *goalCity = 0;
 
@@ -76,17 +96,6 @@ int main(int argc, char const *argv[])
         return result;
     }
 
-    // Get city names
-    if (argc == 3)
-    {
-        snprintf((char *)startCityName, MAX_CITY_NAME_LENGTH, (char *)argv[1]);
-        snprintf((char *)goalCityName, MAX_CITY_NAME_LENGTH, (char *)argv[2]);
-    }
-    else
-    {
-        getCityname((char *)startCityName, (char *)goalCityName);
-    }
-
     // Validate the city names
     if (!isValidSearchNames(map, &startCity, (char *)startCityName, &goalCity, (char *)goalCityName))
         return 0;
@@ -113,7 +122,10 @@ int main(int argc, char const *argv[])
     }
 
     // Clean the memory
+    forEach(routeList, delRoute);
     delList(routeList);
+
+    forEach(map, delCity);
     delList(map);
 
     return 0;

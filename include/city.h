@@ -43,11 +43,11 @@ int compareCityByName(void *, void *);
 //  return int
 int compareNeighbor(void *, void *);
 
-// free memory allocated to a city
-void delCity(City *);
+// Free memory allocated to a city
+void delCity(void *);
 
-// free memory allocated to a neighbor
-void delNeighbor(Neighbor *);
+// Free memory allocated to a neighbor
+void delNeighbor(void *);
 
 // Get the cityname in the list by its name
 //  @param map the list of city

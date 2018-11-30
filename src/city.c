@@ -68,24 +68,25 @@ int compareNeighbor(void *n1, void *n2)
     return ((Neighbor *)n1)->distance - ((Neighbor *)n2)->distance;
 }
 
-// free memory allocated to a city
+// Free memory allocated to a city
 //  @param city the city need to be deleted
-void delCity(City *city)
+void delCity(void *city)
 {
     if (!city)
         return;
 
-    if (city->neighbors)
+    if (((City *)city)->neighbors)
     {
         // free memory allocated to the neighbor list
-        delList(city->neighbors);
+        forEach(((City *)city)->neighbors, delNeighbor);
+        delList(((City *)city)->neighbors);
     }
 
     free(city);
 }
 
-// free memory allocated to a neighbor
-void delNeighbor(Neighbor *neighbor)
+// Free memory allocated to a neighbor
+void delNeighbor(void *neighbor)
 {
     if (!neighbor)
         return;

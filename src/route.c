@@ -17,6 +17,28 @@ int getCostToGoal(City *city, City *goalCity)
 //  @param prevCity the city at the starting side
 //  @param distance the distance between the 2 cities
 //  @param costFromStart the cost from startCity to the prevCity
+//  @return an pointer of empty route if memory allocation OK
+//  @return 0 otherwise
+Route *newFoundRoute(City *city, City *prevCity, int distFromPrev, int costFromStart)
+{
+    Route *route = malloc(sizeof(Route));
+    if (!route)
+        return 0;
+
+    route->city = city;
+    route->prevCity = prevCity;
+    route->distFromPrev = distFromPrev;
+    route->costFromStart = costFromStart;
+    route->costToGoal = INT_MAX;
+
+    return route;
+}
+
+// Allocate memory for a route struct
+//  @param city the city at the ending side
+//  @param prevCity the city at the starting side
+//  @param distance the distance between the 2 cities
+//  @param costFromStart the cost from startCity to the prevCity
 //  @param goalCity the destination city for calculation the costToGoal
 //  @return an pointer of empty route if memory allocation OK
 //  @return 0 otherwise
@@ -41,7 +63,7 @@ Route *newRoute(City *city, City *prevCity, int distance, int costFromStart, Cit
 //  @return int as the differences between the two costToGoal
 int preferSmallCostToGoal(void *r1, void *r2)
 {
-    return ((Route *)r1)->costToGoal - ((Route *)r1)->costToGoal;
+    return ((Route *)r1)->costToGoal - ((Route *)r2)->costToGoal;
 }
 
 // The later route is always < previous route, so that it pop out sooner
@@ -53,7 +75,7 @@ int LIFO(void *r1, void *r2)
 }
 
 // Free memory allocated to a route
-void delRoute(Route *route)
+void delRoute(void *route)
 {
     if (!route)
         free(route);
@@ -96,5 +118,5 @@ Route *isRouteInList(List *list, Route *check, int revertedCheck)
 void printRoute(void *route)
 {
     if (((Route *)route)->prevCity && ((Route *)route)->city)
-        printf("(%s -> %s : %d km)", ((Route *)route)->prevCity->name, ((Route *)route)->city->name, ((Route *)route)->distFromPrev);
+        printf("(%s -> %s : %d km; from start = %d km)", ((Route *)route)->prevCity->name, ((Route *)route)->city->name, ((Route *)route)->distFromPrev, ((Route *)route)->costFromStart);
 }
