@@ -59,13 +59,16 @@ Route *newRoute(City *city, Route *prevRoute, int distance, int cost, City *goal
     return route;
 }
 
-// Compare route to route by total cost to have the better one
+// Compare route to route by total cost (actual cost from start + estimated cost to goal)
 //  @param r1 the pointer to the route 1
 //  @param r2 the pointer to the route 2
 //  @return int as the differences between the two costToGoal
-int preferLowerTotalCost(void *r1, void *r2)
+int compareTotalCost(void *r1, void *r2)
 {
-    return ((Route *)r1)->costFromStart + ((Route *)r1)->costToGoal - ((Route *)r2)->costFromStart - ((Route *)r2)->costToGoal;
+    int totalCost1 = ((Route *)r1)->costFromStart + ((Route *)r1)->costToGoal;
+    int totalCost2 = ((Route *)r2)->costFromStart + ((Route *)r2)->costToGoal;
+
+    return totalCost1 - totalCost2;
 }
 
 // The later route is always < previous route, so that it pop out earlier
@@ -103,15 +106,15 @@ Route *isRouteInList(List *list, Route *check, int revertedCheck)
 
         if (revertedCheck)
         {
-            int cityMatched = check->prevRoute && (strcmpi(route->city->name, check->prevRoute->city->name) == 0);
-            int prevCityMatched = route->prevRoute && (strcmpi(route->prevRoute->city->name, check->city->name) == 0);
+            int cityMatched = check->prevRoute && (strcmp(route->city->name, check->prevRoute->city->name) == 0);
+            int prevCityMatched = route->prevRoute && (strcmp(route->prevRoute->city->name, check->city->name) == 0);
             if (cityMatched && prevCityMatched)
                 return route;
         }
         else
         {
-            int cityMatched = strcmpi(route->city->name, check->prevRoute->city->name) == 0;
-            int prevCityMatched = (route->prevRoute == 0 && check->prevRoute == 0) || ((route->prevRoute && check->prevRoute && strcmpi(route->prevRoute->city->name, check->prevRoute->city->name) == 0));
+            int cityMatched = strcmp(route->city->name, check->prevRoute->city->name) == 0;
+            int prevCityMatched = (route->prevRoute == 0 && check->prevRoute == 0) || ((route->prevRoute && check->prevRoute && strcmp(route->prevRoute->city->name, check->prevRoute->city->name) == 0));
             if (cityMatched && prevCityMatched)
                 return route;
         }

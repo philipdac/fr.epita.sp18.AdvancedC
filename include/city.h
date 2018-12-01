@@ -37,7 +37,7 @@ Neighbor *newNeighbor(City *, int);
 // Compare city to city by name
 //  @param city1 the pointer to the city1
 //  @param city2 the pointer to the city2
-//  return int as the result of strcmpi
+//  return int as the result of strcpm_insensitive
 int compareCityByName(void *, void *);
 
 // Compare neighbor to neighbor by their distance to the city

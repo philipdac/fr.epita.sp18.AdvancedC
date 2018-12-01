@@ -4,8 +4,9 @@
 #include "city.h"
 #include "common.h"
 #include "List.h"
-#include "route.h"
 #include "map.h"
+#include "route.h"
+#include "string_ext.h"
 
 void printError(status code)
 {
@@ -54,18 +55,11 @@ void getCityname(int argc, char const *argv[], char *startCityName, char *goalCi
 
 int isIdenticalName(char *name1, char *name2)
 {
-    return strcmpi(name1, name2) == 0;
+    return strcpm_insensitive(name1, name2) == 0;
 }
 
 int isValidNames(List *map, City **startCity, char *startCityName, City **goalCity, char *goalCityName)
 {
-    if (strcmpi(startCityName, goalCityName) == 0)
-    {
-        // startCityName == goalCityName
-        displayList(map);
-        return 0;
-    }
-
     *startCity = getCityByName(map, startCityName);
     *goalCity = getCityByName(map, goalCityName);
 

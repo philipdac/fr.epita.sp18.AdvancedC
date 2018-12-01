@@ -31,26 +31,24 @@ int isGoodRoute(List *openList, List *closedList, Route *route)
 
     // route existed in openList?
     inList = isRouteInList(openList, route, 0);
-    if (inList && inList->costToGoal > route->costToGoal)
+    if (inList && (inList->costFromStart + inList->costToGoal) > (route->costFromStart + route->costToGoal))
     {
-        // This route is faster and need to be consider
-        // otherwise, just ignore it
+        // This route is faster and need to be considered (good route)
         return -1;
     }
     else
     {
         // route existed in closedList?
         inList = isRouteInList(closedList, route, 0);
-        if (inList && inList->costToGoal > route->costToGoal)
+        if (inList && (inList->costFromStart + inList->costToGoal) > (route->costFromStart + route->costToGoal))
         {
-            // This route is faster and need to be reconsider
-            // otherwise, just ignore it
+            // This route is faster and need to be reconsidered (good route)
             return -1;
         }
         else
         {
-            // It is a new route.
-            // No point to go to a city then go back --> Ignore this route if reverted route existed
+            // It is a new route, then we need to check if we have used this route in a reverted way
+            // as it does not make sense to go to a city then go back --> Ignore this route if reverted route existed
             inList = isRouteInList(closedList, route, -1);
             if (!inList)
             {
@@ -88,20 +86,23 @@ status mapSearch(List *map, City *startCity, City *goalCity, List *routeList)
 
     status exitCode;
 
-    List *openList = newList(preferLowerTotalCost, printRoute);
+    List *openList = newList(compareTotalCost, printRoute);
+
+    // LIFO is the nature of a stack. Function LIFO does not compare anything.
+    // Just use this function for better running speed vs. other comparision function
     List *closedList = newList(LIFO, printRoute);
     if (!openList || !closedList)
         return ERRALLOC;
 
     Route *currentRoute, *nextRoute;
-    Route *start = newRoute(startCity, 0, 0, 0, goalCity);
-    if (!start)
+    Route *firstRoute = newRoute(startCity, 0, 0, 0, goalCity);
+    if (!firstRoute)
     {
         freeMemMapSearch(openList, closedList);
         return ERRALLOC;
     }
 
-    exitCode = addList(openList, start);
+    exitCode = addList(openList, firstRoute);
     if (exitCode != OK)
     {
         freeMemMapSearch(openList, closedList);
@@ -141,17 +142,17 @@ status mapSearch(List *map, City *startCity, City *goalCity, List *routeList)
 
             nextRoute = newRoute(nei->city, currentRoute, nei->distance, nei->distance + currentRoute->costFromStart, goalCity);
 
-            if (nei->city != goalCity)
-            {
-                if (isGoodRoute(openList, closedList, nextRoute))
-                    addList(openList, nextRoute);
-            }
-            else
+            if (nei->city == goalCity)
             {
                 // Reach the destination
+                // This may not the shortest route but the A* algo try to get the result as fast as possible
                 addList(closedList, nextRoute);
                 found = -1;
                 break;
+            }
+            else if (isGoodRoute(openList, closedList, nextRoute))
+            {
+                addList(openList, nextRoute);
             }
         }
     }

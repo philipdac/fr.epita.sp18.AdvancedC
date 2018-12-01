@@ -33,11 +33,11 @@ Route *newFoundRoute(City *, Route *, int, int);
 //  @return 0 otherwise
 Route *newRoute(City *, Route *, int, int, City *);
 
-// Compare route to route by total cost to have the better one
+// Compare route to route by total cost (actual cost from start + estimated cost to goal)
 //  @param r1 the pointer to the route 1
 //  @param r2 the pointer to the route 2
 //  return int as the result of costToGoal1 - costToGoal2
-int preferLowerTotalCost(void *, void *);
+int compareTotalCost(void *, void *);
 
 // The later route is always < previous route, so that it pop out earlier
 //  @param r1 the pointer to the route 1

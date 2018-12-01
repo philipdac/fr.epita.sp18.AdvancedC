@@ -4,6 +4,7 @@
 #include "city.h"
 #include "List.h"
 #include "route.h"
+#include "string_ext.h"
 
 // return an empty city pointer if memory allocation OK
 // return 0 otherwise
@@ -53,10 +54,10 @@ Neighbor *newNeighbor(City *city, int distance)
 // Compare city to city by name
 //  @param city1 the pointer to the city1
 //  @param city2 the pointer to the city2
-//  return int as the result of strcmpi
+//  return int as the result of strcpm_insensitive
 int compareCityByName(void *city1, void *city2)
 {
-    return strcmpi(((City *)city1)->name, ((City *)city2)->name);
+    return strcpm_insensitive(((City *)city1)->name, ((City *)city2)->name);
 }
 
 // Compare neighbor to neighbor by their distance to the city
