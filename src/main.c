@@ -5,29 +5,22 @@
 #include "common.h"
 #include "List.h"
 #include "map.h"
-#include "route.h"
 #include "string_ext.h"
+#include "vertex.h"
 
 void printError(status code)
 {
     printf("Run time error: %s\n", message(code));
 }
 
-void printErrorIdenticalName()
-{
-    printf("You have input the same name for 2 cities.\n");
-    printf("Let's use 2 different names instead.\n");
-}
-
 void printErrorUnknownName()
 {
     printf("We can't find the entered name(s) in our database\n");
-    printf("Route searching failed\n");
 }
 
 void printInstruction(List *map)
 {
-    printf("Please use city name in the below list: \n");
+    printf("Route searching is limited to the below list: \n");
     displayList(map);
 }
 
@@ -40,7 +33,7 @@ void getCityname(int argc, char const *argv[], char *startCityName, char *goalCi
         return;
     }
 
-    printf("Searching for the shortest routeList between 2 cities.\n");
+    printf("Searching for route between 2 cities.\n");
 
     printf(" - Enter the name of city 1: ");
     // Only get MAX_CITY_NAME_LENGTH from the keyboard
@@ -53,11 +46,6 @@ void getCityname(int argc, char const *argv[], char *startCityName, char *goalCi
     goalCityName[strcspn(goalCityName, "\n")] = 0;
 }
 
-int isIdenticalName(char *name1, char *name2)
-{
-    return strcpm_insensitive(name1, name2) == 0;
-}
-
 int isValidNames(List *map, City **startCity, char *startCityName, City **goalCity, char *goalCityName)
 {
     *startCity = getCityByName(map, startCityName);
@@ -65,14 +53,13 @@ int isValidNames(List *map, City **startCity, char *startCityName, City **goalCi
 
     if (!*startCity || !*goalCity)
     {
-        printInstruction(map);
         return 0;
     }
 
     return -1;
 }
 
-status initVariables(List **map, List **routeList)
+status initVariables(List **map, List **route)
 {
     *map = newList(compareCityByName, printCityInfo);
     if (!(*map))
@@ -80,8 +67,8 @@ status initVariables(List **map, List **routeList)
         return ERRALLOC;
     }
 
-    *routeList = newList(LIFO, printRoute);
-    if (!(*routeList))
+    *route = newList(LIFO, printVertex);
+    if (!(*route))
     {
         free(map);
         return ERRALLOC;
@@ -90,10 +77,10 @@ status initVariables(List **map, List **routeList)
     return OK;
 }
 
-void delVariables(List *map, List *routeList)
+void delVariables(List *map, List *route)
 {
-    forEach(routeList, delRoute);
-    delList(routeList);
+    forEach(route, delVertex);
+    delList(route);
 
     forEach(map, delCity);
     delList(map);
@@ -108,16 +95,9 @@ int main(int argc, char const *argv[])
     // Get city names
     getCityname(argc, argv, (char *)startCityName, (char *)goalCityName);
 
-    // Reject when both names are identical
-    if (isIdenticalName(startCityName, goalCityName))
-    {
-        printErrorIdenticalName();
-        return 0;
-    }
-
-    // Initiate the map and routes
-    List *map, *routeList;
-    exitCode = initVariables(&map, &routeList);
+    // Initiate the map and vertex list
+    List *map, *route;
+    exitCode = initVariables(&map, &route);
     if (exitCode != OK)
     {
         printError(exitCode);
@@ -130,7 +110,7 @@ int main(int argc, char const *argv[])
     if (exitCode != OK)
     {
         printError(exitCode);
-        delVariables(map, routeList);
+        delVariables(map, route);
         return exitCode;
     }
 
@@ -140,32 +120,37 @@ int main(int argc, char const *argv[])
     {
         printErrorUnknownName();
         printInstruction(map);
-        delVariables(map, routeList);
+        delVariables(map, route);
         return 0;
     }
 
     // Perform the search
-    exitCode = mapSearch(map, startCity, goalCity, routeList);
+    exitCode = mapSearch(map, startCity, goalCity, route);
     if (exitCode != OK)
     {
         printError(exitCode);
-        delVariables(map, routeList);
+        delVariables(map, route);
         return exitCode;
     }
 
     // Display the search exitCode
-    if (!lengthList(routeList))
+    if (!lengthList(route))
     {
-        printf("Sorry there is no route from %s to %s in our database", startCity->name, goalCity->name);
+        printf("Sorry there is no route found from %s to %s in our database\n", startCity->name, goalCity->name);
+        printInstruction(map);
     }
     else
     {
         printf("Result:\n");
-        displayList(routeList);
+        if (route->nelts == 1)
+            // User friendly message, print the special case: start city == goal city
+            printf("  Special case: City 1 is identical with city 2");
+        else
+            displayList(route);
     }
 
     // Clean the memory
-    delVariables(map, routeList);
+    delVariables(map, route);
 
     return 0;
 }

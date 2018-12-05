@@ -11,12 +11,13 @@
 //  return status the result of reading and mapping the data file
 status mapReadDataFile(char *, List *);
 
-// Search the shortest route between fromCity and toCity
+// An implementation of A* algorithm
+// Search the route between startCity and goalCity
 //  @param map the map where we perform our search
-//  @param fromCity the starting city
-//  @param toCity the destination city
+//  @param startCity the starting city
+//  @param goalCity the destination city
 //  @param route the result route
-//  @ return ERRINDEX if any error occurs during the search
+//  @ return status if any error occurs during the search
 //  @ return OK otherwise
 status mapSearch(List *, City *, City *, List *);
 

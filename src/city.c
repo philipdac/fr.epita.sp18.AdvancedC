@@ -3,8 +3,8 @@
 
 #include "city.h"
 #include "List.h"
-#include "route.h"
 #include "string_ext.h"
+#include "vertex.h"
 
 // return an empty city pointer if memory allocation OK
 // return 0 otherwise

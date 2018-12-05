@@ -4,60 +4,54 @@
 #include "common.h"
 #include "city.h"
 #include "List.h"
-#include "route.h"
 #include "status.h"
+#include "vertex.h"
 
-status linkFoundRoutes(List *routeList, Route *finalRoute)
+status linkFoundVertex(List *route, Vertex *finalVertex)
 {
     status exitCode;
-    Route *route = finalRoute;
+    Vertex *vertex = finalVertex;
 
-    while (route->prevRoute)
+    while (1)
     {
-        Route *found = newFoundRoute(route->city, route->prevRoute, route->distFromPrev, route->costFromStart);
-        exitCode = addList(routeList, found);
+        Vertex *found = newVertex(vertex->prevVertex, vertex->city, vertex->costFromPrev, vertex->costFromStart, -1);
+        exitCode = addList(route, found);
         if (exitCode != OK)
             return exitCode;
 
-        route = route->prevRoute;
+        vertex = vertex->prevVertex;
+        if (!vertex)
+            return OK;
     }
-
-    return OK;
 }
 
-int isGoodRoute(List *openList, List *closedList, Route *route)
+int isVertexOpenable(List *openList, List *closedList, Vertex *vertex)
 {
-    Route *inList;
+    Vertex *inList;
 
-    // route existed in openList?
-    inList = isRouteInList(openList, route, 0);
-    if (inList && (inList->costFromStart + inList->costToGoal) > (route->costFromStart + route->costToGoal))
+    // vertex existed in openList?
+    inList = isVertexInList(openList, vertex);
+    if (inList)
     {
-        // This route is faster and need to be considered (good route)
-        return -1;
-    }
-    else
-    {
-        // route existed in closedList?
-        inList = isRouteInList(closedList, route, 0);
-        if (inList && (inList->costFromStart + inList->costToGoal) > (route->costFromStart + route->costToGoal))
-        {
-            // This route is faster and need to be reconsidered (good route)
+        if ((inList->costFromStart + inList->costToGoal) > (vertex->costFromStart + vertex->costToGoal))
+            // Route thru this vertex is shorter and need to be considered
             return -1;
-        }
         else
-        {
-            // It is a new route, then we need to check if we have used this route in a reverted way
-            // as it does not make sense to go to a city then go back --> Ignore this route if reverted route existed
-            inList = isRouteInList(closedList, route, -1);
-            if (!inList)
-            {
-                inList = isRouteInList(openList, route, -1);
-                if (!inList)
-                    // A completely new route
-                    return -1;
-            }
-        }
+            // Route thru this vertext is longer --> can be ignored
+            return 0;
+    }
+
+    // vertex existed in closedList?
+    inList = isVertexInList(closedList, vertex);
+    if (!inList)
+        // A new vertex
+        return -1;
+
+    if ((inList->costFromStart + inList->costToGoal) > (vertex->costFromStart + vertex->costToGoal))
+    {
+        // This vertex was visited but there is a new shorter route
+        // Need to be reconsidered
+        return -1;
     }
 
     return 0;
@@ -65,44 +59,45 @@ int isGoodRoute(List *openList, List *closedList, Route *route)
 
 void freeMemMapSearch(List *openList, List *closedList)
 {
-    forEach(openList, delRoute);
+    forEach(openList, delVertex);
     delList(openList);
 
-    forEach(closedList, delRoute);
+    forEach(closedList, delVertex);
     delList(closedList);
 }
 
-// Search the shortest route between startCity and goalCity
+// An implementation of A* algorithm
+// Search the route between startCity and goalCity
 //  @param map the map where we perform our search
 //  @param startCity the starting city
 //  @param goalCity the destination city
 //  @param route the result route
-//  @ return ERRINDEX if any error occurs during the search
+//  @ return status if any error occurs during the search
 //  @ return OK otherwise
-status mapSearch(List *map, City *startCity, City *goalCity, List *routeList)
+status mapSearch(List *map, City *startCity, City *goalCity, List *route)
 {
-    if (!map || !routeList)
+    if (!map || !route)
         return ERREMPTY;
 
     status exitCode;
 
-    List *openList = newList(compareTotalCost, printRoute);
+    List *openList = newList(compareTotalCost, printVertex);
 
     // LIFO is the nature of a stack. Function LIFO does not compare anything.
     // Just use this function for better running speed vs. other comparision function
-    List *closedList = newList(LIFO, printRoute);
+    List *closedList = newList(compareByCityName, printVertex);
     if (!openList || !closedList)
         return ERRALLOC;
 
-    Route *currentRoute, *nextRoute;
-    Route *firstRoute = newRoute(startCity, 0, 0, 0, goalCity);
-    if (!firstRoute)
+    Vertex *current, *next;
+    Vertex *first = newVertex(0, startCity, 0, 0, INT_MAX);
+    if (!first)
     {
         freeMemMapSearch(openList, closedList);
         return ERRALLOC;
     }
 
-    exitCode = addList(openList, firstRoute);
+    exitCode = addList(openList, first);
     if (exitCode != OK)
     {
         freeMemMapSearch(openList, closedList);
@@ -110,19 +105,25 @@ status mapSearch(List *map, City *startCity, City *goalCity, List *routeList)
     }
 
     int found = 0;
-    while (openList->nelts > 0 && !found)
+    while (openList->nelts > 0)
     {
-        // The top node in openList has lowest costToGoal
-        exitCode = nthInList(openList, 1, (void *)&currentRoute);
-
-        exitCode = addList(closedList, currentRoute);
+        // The current vertex in openList has lowest costToGoal
+        // Pop it out for processing
+        exitCode = remFromListAt(openList, 1, (void *)&current);
         if (exitCode != OK)
         {
             freeMemMapSearch(openList, closedList);
             return exitCode;
         }
 
-        exitCode = remFromList(openList, currentRoute);
+        // Break the while loop if it reaches the goal
+        if (current->city == goalCity)
+        {
+            found = -1;
+            break;
+        }
+
+        exitCode = addList(closedList, current);
         if (exitCode != OK)
         {
             freeMemMapSearch(openList, closedList);
@@ -130,34 +131,31 @@ status mapSearch(List *map, City *startCity, City *goalCity, List *routeList)
         }
 
         int i;
-        for (i = 1; i <= currentRoute->city->neighbors->nelts; i++)
+        for (i = 1; i <= current->city->neighbors->nelts; i++)
         {
             Neighbor *nei;
-            exitCode = nthInList(currentRoute->city->neighbors, i, (void *)&nei);
+            exitCode = nthInList(current->city->neighbors, i, (void *)&nei);
             if (exitCode != OK)
             {
                 freeMemMapSearch(openList, closedList);
                 return exitCode;
             }
 
-            nextRoute = newRoute(nei->city, currentRoute, nei->distance, nei->distance + currentRoute->costFromStart, goalCity);
+            next = newVertex(current, nei->city, nei->distance, nei->distance + current->costFromStart, estimateCostToGoal(nei->city, goalCity));
 
-            if (nei->city == goalCity)
+            if (isVertexOpenable(openList, closedList, next))
             {
-                // Reach the destination
-                // This may not the shortest route but the A* algo try to get the result as fast as possible
-                addList(closedList, nextRoute);
-                found = -1;
-                break;
-            }
-            else if (isGoodRoute(openList, closedList, nextRoute))
-            {
-                addList(openList, nextRoute);
+                addList(openList, next);
             }
         }
     }
 
-    exitCode = linkFoundRoutes(routeList, nextRoute);
+    if (found)
+        exitCode = linkFoundVertex(route, current);
+    else
+        // Not found: run until openList is empty but can't reach the goal city
+        exitCode = OK;
+
     freeMemMapSearch(openList, closedList);
 
     return exitCode;
