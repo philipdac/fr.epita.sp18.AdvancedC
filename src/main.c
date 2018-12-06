@@ -133,20 +133,20 @@ int main(int argc, char const *argv[])
         return exitCode;
     }
 
-    // Display the search exitCode
-    if (!lengthList(route))
+    // Display the search result
+    switch (route->nelts)
     {
-        printf("Sorry there is no route found from %s to %s in our database\n", startCity->name, goalCity->name);
+    case 0:
+        printf("Sorry, there is no route found from %s to %s in our database\n", startCity->name, goalCity->name);
         printInstruction(map);
-    }
-    else
-    {
+        break;
+    case 1:
+        // User friendly message for the special case: start city == goal city
+        printf("Special case: city 1 is identical to city 2. No further move needed.\n");
+        break;
+    default:
         printf("Result:\n");
-        if (route->nelts == 1)
-            // User friendly message, print the special case: start city == goal city
-            printf("  Special case: City 1 is identical with city 2");
-        else
-            displayList(route);
+        displayList(route);
     }
 
     // Clean the memory
