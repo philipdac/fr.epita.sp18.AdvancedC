@@ -34,8 +34,11 @@ int isVertexOpenable(List *openList, List *closedList, Vertex *vertex)
     if (inList)
     {
         if ((inList->costFromStart) > (vertex->costFromStart))
+        {
             // Route thru this vertex is shorter and need to be considered
+            remFromList(openList, inList);
             return -1;
+        }
         else
             // Route thru this vertext is longer --> can be ignored
             return 0;
@@ -50,7 +53,11 @@ int isVertexOpenable(List *openList, List *closedList, Vertex *vertex)
     if ((inList->costFromStart) > (vertex->costFromStart))
     {
         // This vertex was visited but the new route is shorter --> reconsidered
-        return -1;
+        {
+            // Route thru this vertex is shorter and need to be considered
+            remFromList(closedList, inList);
+            return -1;
+        }
     }
 
     return 0;
