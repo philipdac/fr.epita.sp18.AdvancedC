@@ -33,7 +33,7 @@ int isVertexOpenable(List *openList, List *closedList, Vertex *vertex)
     inList = isVertexInList(openList, vertex);
     if (inList)
     {
-        if ((inList->costFromStart + inList->costToGoal) > (vertex->costFromStart + vertex->costToGoal))
+        if ((inList->costFromStart) > (vertex->costFromStart))
             // Route thru this vertex is shorter and need to be considered
             return -1;
         else
@@ -47,10 +47,9 @@ int isVertexOpenable(List *openList, List *closedList, Vertex *vertex)
         // A new vertex
         return -1;
 
-    if ((inList->costFromStart + inList->costToGoal) > (vertex->costFromStart + vertex->costToGoal))
+    if ((inList->costFromStart) > (vertex->costFromStart))
     {
-        // This vertex was visited but there is a new shorter route
-        // Need to be reconsidered
+        // This vertex was visited but the new route is shorter --> reconsidered
         return -1;
     }
 
