@@ -11,7 +11,8 @@ OBJS = $(SRCS_FILE:%.c=$(BUILD_DIR)/%.o)
 CC = gcc
 
 INCL_FLAG = -I $(INCL_DIRS)
-DEBUG_FLAG = -g -D DEBUG
+DEBUG_FLAG = -g -lm
+# DEBUG_FLAG = -g -lm -D DEBUG
 
 $(BUILD_DIR)/%.o: $(SRC_DIRS)/%.c
 	$(CC) -c $< -o $@ $(INCL_FLAG) $(DEBUG_FLAG)

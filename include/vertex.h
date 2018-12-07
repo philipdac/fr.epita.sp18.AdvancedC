@@ -24,7 +24,7 @@ typedef struct Vertex
 //  @return 0 otherwise
 Vertex *newVertex(Vertex *, City *, int, int, int);
 
-// Estimate cost to goal as Euclidean distance
+// Estimate cost to goal as Manhattan distance
 //  @param city the first point
 //  @param goalCity the second point
 //  @return the calculation result

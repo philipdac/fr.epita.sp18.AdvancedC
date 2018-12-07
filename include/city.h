@@ -13,10 +13,8 @@ typedef struct Neighbor
 typedef struct City
 {
     char name[MAX_CITY_NAME_LENGTH];
-
-    // Equivalent to position X,Y in the .map file
-    int latitude;
-    int longitude;
+    int posX;
+    int posY;
 
     struct List *neighbors;
 } City;
@@ -26,7 +24,6 @@ typedef struct City
 //  return 0 otherwise
 City *newCity();
 
-// Allocate memory for a neighbor struct and set the its information
 // Allocate memory for a neighbor struct and set the its information
 //  @param city the city that is playing a role of neighbor
 //  @param distance the distance between this city and the previous one
@@ -67,8 +64,8 @@ void printNeighborInfo(void *);
 // set the city information
 //  @param city the city that has the name
 //  @param name the name to be set
-//  @param latitude the latitude to be
-//  @param longitude the longitude to be set
+//  @param posX the posX to be set
+//  @param posY the posY to be set
 void setCityInfo(City *, char *, int, int);
 
 // set the cityname

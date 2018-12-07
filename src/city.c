@@ -28,8 +28,8 @@ City *newCity()
 
     city->name[0] = 0;
     city->neighbors = neighborList;
-    city->latitude = 0;
-    city->longitude = 0;
+    city->posX = 0;
+    city->posY = 0;
 
     return city;
 }
@@ -105,7 +105,7 @@ City *getCityByName(List *map, char *name)
 
     if (!city)
     {
-        printf(message(ERRALLOC));
+        printf("%s", message(ERRALLOC));
         return 0;
     }
 
@@ -129,7 +129,7 @@ void printCityInfo(void *city)
 
     // Display neighbor name for testing purpose only
     // printf("\n");
-    // printf("%s, position : %d/%d, neighbors : %d\n", ((City *)city)->name, ((City *)city)->latitude, ((City *)city)->longitude, ((City *)city)->neighbors->nelts);
+    // printf("%s, position : %d/%d, neighbors : %d\n", ((City *)city)->name, ((City *)city)->posX, ((City *)city)->posY, ((City *)city)->neighbors->nelts);
     // displayList(((City *)city)->neighbors);
 }
 
@@ -142,16 +142,16 @@ void printNeighborInfo(void *n)
 // set the cityname
 //  @param city the city that has the name
 //  @param name the name to be set
-//  @param latitude the latitude to be set
-//  @param longitude the longitude to be set
-void setCityInfo(City *city, char *name, int latitude, int longitude)
+//  @param posX the posX to be set
+//  @param posY the posY to be set
+void setCityInfo(City *city, char *name, int posX, int posY)
 {
     if (!city)
         return;
 
     setCityname(city, name);
-    city->latitude = latitude;
-    city->longitude = longitude;
+    city->posX = posX;
+    city->posY = posY;
 }
 
 // set the cityname
@@ -162,5 +162,5 @@ void setCityname(City *city, char *name)
     if (!city)
         return;
 
-    snprintf(city->name, MAX_CITY_NAME_LENGTH, name);
+    snprintf(city->name, MAX_CITY_NAME_LENGTH, "%s", name);
 }

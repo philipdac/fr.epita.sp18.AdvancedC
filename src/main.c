@@ -28,8 +28,8 @@ void getCityname(int argc, char const *argv[], char *startCityName, char *goalCi
 {
     if (argc == 3)
     {
-        snprintf((char *)startCityName, MAX_CITY_NAME_LENGTH, argv[1]);
-        snprintf((char *)goalCityName, MAX_CITY_NAME_LENGTH, argv[2]);
+        snprintf((char *)startCityName, MAX_CITY_NAME_LENGTH, "%s", argv[1]);
+        snprintf((char *)goalCityName, MAX_CITY_NAME_LENGTH, "%s", argv[2]);
         return;
     }
 

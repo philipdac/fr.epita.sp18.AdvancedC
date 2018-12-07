@@ -29,17 +29,16 @@ Vertex *newVertex(Vertex *prevVertex, City *city, int costFromPrev, int costFrom
     return vertex;
 }
 
-// Estimate cost to goal as Euclidean distance
+// Estimate cost from a city to goal as Manhattan distance
 //  @param city the first point
 //  @param goalCity the second point
 //  @return the calculation result
 int estimateCostToGoal(City *city, City *goalCity)
 {
-    int gap1 = city->latitude - goalCity->latitude;
-    int gap2 = city->longitude - goalCity->longitude;
-    int cost = gap1 * gap1 + gap2 * gap2;
+    int gap1 = abs(city->posX - goalCity->posX);
+    int gap2 = abs(city->posY - goalCity->posY);
 
-    return sqrt(cost);
+    return (gap1 + gap2) / 4;
 }
 
 // Compare vertex to vertex by total cost (actual cost from start + estimated cost to goal)
