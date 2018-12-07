@@ -20,7 +20,7 @@ void printErrorUnknownName()
 
 void printInstruction(List *map)
 {
-    printf("Route searching is limited to the below list: \n");
+    printf("Route searching is limited to the below list only: \n");
     displayList(map);
 }
 
@@ -95,7 +95,7 @@ int main(int argc, char const *argv[])
     // Get city names
     getCityname(argc, argv, (char *)startCityName, (char *)goalCityName);
 
-    // Initiate the map and vertex list
+    // Initiate the map and route result list
     List *map, *route;
     exitCode = initVariables(&map, &route);
     if (exitCode != OK)
@@ -141,12 +141,14 @@ int main(int argc, char const *argv[])
         printInstruction(map);
         break;
     case 1:
-        // User friendly message for the special case: start city == goal city
+        // Print a more friendly message when start city == goal city
         printf("Special case: city 1 is identical to city 2. No further move needed.\n");
         break;
     default:
+        printf("Searching for route from  %s to %s\n", startCity->name, goalCity->name);
         printf("Result:\n");
         displayList(route);
+        printf("\n");
     }
 
     // Clean the memory
